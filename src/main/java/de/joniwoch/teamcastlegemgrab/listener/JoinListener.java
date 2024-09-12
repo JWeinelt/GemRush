@@ -5,6 +5,7 @@ import de.joniwoch.teamcastlegemgrab.manager.items.lobbyitems.LobbyItemManager;
 import de.joniwoch.teamcastlegemgrab.utils.Messages;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.GameMode;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -36,5 +37,7 @@ public class JoinListener implements Listener {
         player.setFoodLevel(20);
         player.setLevel(Calendar.getInstance().get(Calendar.YEAR));
         player.setExp((float) Calendar.getInstance().get(Calendar.DAY_OF_YEAR) / 365);
+        player.sendTitle("§4§lGem§c§lGrab", "§aViel Spaß!");
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 3);
     }
 }
