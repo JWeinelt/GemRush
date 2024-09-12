@@ -1,6 +1,6 @@
 package de.joniwoch.teamcastlegemgrab.manager.game;
 
-public enum GameStates {
+public enum Gamestate {
 
     LOBBY,
     STARTING,
