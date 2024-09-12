@@ -1,0 +1,4 @@
+name: TeamcastleGemgrab
+version: '${version}'
+main: de.joniwoch.teamcastlegemgrab.TeamcastleGemgrab
+api-version: '1.20'
