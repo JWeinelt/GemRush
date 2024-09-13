@@ -5,6 +5,7 @@ import de.joniwoch.teamcastlegemgrab.listener.PlayerListener;
 import de.joniwoch.teamcastlegemgrab.listener.WorldListener;
 import de.joniwoch.teamcastlegemgrab.manager.game.Gamestate;
 import de.joniwoch.teamcastlegemgrab.manager.items.lobbyitems.LobbyItemManager;
+import de.joniwoch.teamcastlegemgrab.manager.teams.TeamManager;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -24,6 +25,7 @@ public final class TeamcastleGemgrab extends JavaPlugin {
     private static Gamestate gamestate;
 
     private LobbyItemManager lobbyItemManager;
+    private TeamManager teamManager;
 
 
     @Override
@@ -32,9 +34,15 @@ public final class TeamcastleGemgrab extends JavaPlugin {
         gamestate = Gamestate.LOBBY;
 
         this.lobbyItemManager = new LobbyItemManager();
+        this.teamManager = new TeamManager();
 
         registerListener();
+        preparePlugin();
         setWorldSettings();
+    }
+
+    public void preparePlugin() {
+        this.teamManager.registerTeams();
     }
 
     public void registerListener() {
