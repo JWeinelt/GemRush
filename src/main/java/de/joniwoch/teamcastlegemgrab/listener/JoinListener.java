@@ -2,6 +2,7 @@ package de.joniwoch.teamcastlegemgrab.listener;
 
 import de.joniwoch.teamcastlegemgrab.TeamcastleGemgrab;
 import de.joniwoch.teamcastlegemgrab.manager.items.lobbyitems.LobbyItemManager;
+import de.joniwoch.teamcastlegemgrab.manager.locations.LobbyLocationManager;
 import de.joniwoch.teamcastlegemgrab.scoreboard.LobbyScoreboard;
 import de.joniwoch.teamcastlegemgrab.utils.Messages;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.Calendar;
 public class JoinListener implements Listener {
 
     private final LobbyItemManager lobbyItemManager;
+    private final LobbyLocationManager lobbyLocationManager;
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
@@ -32,6 +34,7 @@ public class JoinListener implements Listener {
 
     public void doLobbyJoin(Player player) {
         lobbyItemManager.setLobbyItems(player);
+        lobbyLocationManager.teleportLobbySpawn(player);
         player.setGameMode(GameMode.SURVIVAL);
         player.setAllowFlight(false);
         player.setHealth(20);

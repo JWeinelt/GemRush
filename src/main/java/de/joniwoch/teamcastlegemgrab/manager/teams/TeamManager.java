@@ -37,11 +37,7 @@ public class TeamManager {
         if (isInTeam(player)) {
             leaveTeam(player);
         }
-        for (GemgrabTeam gemgrabTeam : teams) {
-            if (gemgrabTeam.getTeamColor().equals(team)) {
-                gemgrabTeam.getPlayers().add(player);
-            }
-        }
+        getTeamByColor(team).getPlayers().add(player);
     }
 
     public void leaveTeam(UUID player) {
