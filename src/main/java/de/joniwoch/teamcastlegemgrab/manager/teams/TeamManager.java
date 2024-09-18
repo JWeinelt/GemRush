@@ -1,5 +1,6 @@
 package de.joniwoch.teamcastlegemgrab.manager.teams;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -11,8 +12,8 @@ public class TeamManager {
 
     public List<GemgrabTeam> teams = new CopyOnWriteArrayList<>();
     public void registerTeams() {
-        teams.add(new GemgrabTeam(1, TeamColor.BLUE, new CopyOnWriteArrayList<>()));
-        teams.add(new GemgrabTeam(2, TeamColor.RED, new CopyOnWriteArrayList<>()));
+        teams.add(new GemgrabTeam(1, TeamColor.BLUE, new CopyOnWriteArrayList<>(), "§1", Material.BLUE_WOOL, "§1Blau"));
+        teams.add(new GemgrabTeam(2, TeamColor.RED, new CopyOnWriteArrayList<>(), "§4", Material.RED_WOOL, "§4Rot"));
     }
 
     public GemgrabTeam getTeamByColor(TeamColor teamColor) {
@@ -22,6 +23,18 @@ public class TeamManager {
             }
         }
         return null;
+    }
+
+    public String getColorcodeByColor(TeamColor teamColor) {
+        switch (teamColor) {
+            case BLUE -> {
+                return "§1";
+            }
+            case RED -> {
+                return "§4";
+            }
+        }
+        return "";
     }
 
     public boolean isInTeam(UUID player) {

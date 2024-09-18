@@ -1,5 +1,6 @@
 package de.joniwoch.teamcastlegemgrab.scoreboard;
 
+import de.joniwoch.teamcastlegemgrab.manager.game.GameSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
@@ -15,7 +16,7 @@ public class LobbyScoreboard {
 
         Team onlineplayers = scoreboard.registerNewTeam("onlineplayers");
         onlineplayers.addEntry("§3");
-        onlineplayers.setPrefix("§2" + onlinePlayers + "§7/§416");
+        onlineplayers.setPrefix("§2" + onlinePlayers + "§7/§4" + GameSettings.getTeamSize() * 2);
 
         Team playerRole = scoreboard.registerNewTeam("role");
         playerRole.addEntry("§4");

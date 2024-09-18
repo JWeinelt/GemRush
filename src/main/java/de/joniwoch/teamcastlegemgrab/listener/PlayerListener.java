@@ -2,6 +2,9 @@ package de.joniwoch.teamcastlegemgrab.listener;
 
 import de.joniwoch.teamcastlegemgrab.TeamcastleGemgrab;
 import de.joniwoch.teamcastlegemgrab.manager.game.Gamestate;
+import de.joniwoch.teamcastlegemgrab.manager.teams.TeamGUI;
+import de.joniwoch.teamcastlegemgrab.manager.teams.TeamManager;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,7 +16,10 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 
+@RequiredArgsConstructor
 public class PlayerListener implements Listener {
+
+    private final TeamManager teamManager;
 
     @EventHandler
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
@@ -43,6 +49,18 @@ public class PlayerListener implements Listener {
             case LOBBY -> {
                 event.setCancelled(true);
             }
+        }
+        if (event.getItem() == null) return;
+        if (!event.getItem().hasItemMeta()) return;
+        if (!event.getItem().getItemMeta().hasDisplayName()) return;
+        if (event.getItem().getItemMeta().getDisplayName() == null) return;
+
+        String itemName = event.getItem().getItemMeta().getDisplayName();
+
+        switch (itemName) {
+            case "§8» §e§lTeams §8«":
+                new TeamGUI(teamManager).open(player);
+                break;
         }
     }
 
