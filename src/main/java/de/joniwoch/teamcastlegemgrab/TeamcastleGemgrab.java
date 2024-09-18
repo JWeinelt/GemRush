@@ -6,6 +6,7 @@ import de.joniwoch.teamcastlegemgrab.commands.SetLobbySpawnCommand;
 import de.joniwoch.teamcastlegemgrab.commands.StartCommand;
 import de.joniwoch.teamcastlegemgrab.listener.JoinListener;
 import de.joniwoch.teamcastlegemgrab.listener.PlayerListener;
+import de.joniwoch.teamcastlegemgrab.listener.QuitListener;
 import de.joniwoch.teamcastlegemgrab.listener.WorldListener;
 import de.joniwoch.teamcastlegemgrab.manager.game.GameSettings;
 import de.joniwoch.teamcastlegemgrab.manager.game.GameStartHandler;
@@ -90,6 +91,7 @@ public final class TeamcastleGemgrab extends JavaPlugin {
         manager.registerEvents(new JoinListener(lobbyItemManager, lobbyLocationManager, scoreboard), this);
         manager.registerEvents(new PlayerListener(teamManager), this);
         manager.registerEvents(new WorldListener(), this);
+        manager.registerEvents(new QuitListener(teamManager), this);
     }
 
     public void registerCommands() {

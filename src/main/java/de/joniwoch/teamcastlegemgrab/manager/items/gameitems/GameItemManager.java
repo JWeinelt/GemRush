@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -24,6 +25,8 @@ public class GameItemManager {
         if (meta != null) {
             meta.setColor(Color.BLUE);
             meta.setDisplayName("§6Brustplatte");
+            meta.setUnbreakable(true);
+            meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
             blueChestplate.setItemMeta(meta);
         }
         return blueChestplate;
@@ -34,6 +37,9 @@ public class GameItemManager {
         LeatherArmorMeta meta = (LeatherArmorMeta) redChestplate.getItemMeta();
         if (meta != null) {
             meta.setColor(Color.RED);
+            meta.setDisplayName("§6Brustplatte");
+            meta.setUnbreakable(true);
+            meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
             redChestplate.setItemMeta(meta);
         }
         return redChestplate;
@@ -48,14 +54,6 @@ public class GameItemManager {
         if (potionMeta != null) {
             potionMeta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL, false, true));
             potion.setItemMeta(potionMeta);
-        }
-
-        ItemStack blueChestplate = new ItemStack(Material.LEATHER_CHESTPLATE);
-        LeatherArmorMeta meta = (LeatherArmorMeta) blueChestplate.getItemMeta();
-        if (meta != null) {
-            meta.setColor(Color.BLUE);
-            meta.setDisplayName("§6Brustplatte");
-            blueChestplate.setItemMeta(meta);
         }
 
         player.getInventory().setItem(0, new ItemAPI("§6Schwert", Material.STONE_SWORD, 1, true).build());

@@ -1,0 +1,62 @@
+package de.joniwoch.teamcastlegemgrab.manager.game.gems;
+
+import de.joniwoch.teamcastlegemgrab.TeamcastleGemgrab;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.EulerAngle;
+
+@UtilityClass
+public class GemSpawnerManager {
+
+    public void createGemSpawner(Location location) {
+        Location spawnLocation = location.clone().add(0.5, 1.5, 0.5);
+        ArmorStand armorStand = (ArmorStand) location.getWorld().spawnEntity(spawnLocation, EntityType.ARMOR_STAND);
+        armorStand.setVisible(false);
+        armorStand.setGravity(false);
+        armorStand.setInvulnerable(true);
+        armorStand.setMarker(true);
+        ItemStack diamondBlock = new ItemStack(Material.EMERALD_BLOCK);
+        armorStand.getEquipment().setHelmet(diamondBlock);
+
+        ArmorStand textStand = (ArmorStand) location.getWorld().spawnEntity(spawnLocation.clone().add(0, 2.5, 0), EntityType.ARMOR_STAND);
+        textStand.setCustomName("§a§lGem-Spawner");
+        textStand.setCustomNameVisible(true);
+        textStand.setVisible(false);
+        textStand.setInvulnerable(true);
+        textStand.setGravity(false);
+        textStand.setMarker(true);
+
+        ArmorStand textStand2 = (ArmorStand) location.getWorld().spawnEntity(spawnLocation.clone().add(0, 2.2, 0), EntityType.ARMOR_STAND);
+        textStand2.setCustomName("§7Erscheint in §c5 §7Sekunden");
+        textStand2.setCustomNameVisible(true);
+        textStand2.setVisible(false);
+        textStand2.setInvulnerable(true);
+        textStand2.setGravity(false);
+        textStand2.setMarker(true);
+
+        new BukkitRunnable() {
+            double angle = 0;
+            double ticks = 0;
+
+            @Override
+            public void run() {
+                angle += 3;
+                double yOffset = Math.sin(ticks / 10.0) * 0.15;
+                ticks += 1;
+
+                armorStand.setHeadPose(new EulerAngle(0, Math.toRadians(angle), 0));
+                Location newLocation = spawnLocation.clone().add(0, yOffset, 0);
+                armorStand.teleport(newLocation);
+
+                if (angle >= 360) {
+                    angle = 0;
+                }
+            }
+        }.runTaskTimer(TeamcastleGemgrab.getInstance(), 0L, 1L);
+    }
+}

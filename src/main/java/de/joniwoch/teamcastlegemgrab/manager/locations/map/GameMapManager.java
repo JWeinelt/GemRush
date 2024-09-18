@@ -56,7 +56,7 @@ public class GameMapManager {
     public void cacheGameMap() {
         Location spawner = new Location(Bukkit.getWorld("world"),
                 Config.config.getInt("Map.Spawner.X"),
-                Config.config.getInt("Map.Spawner.X"),
+                Config.config.getInt("Map.Spawner.Y"),
                 Config.config.getInt("Map.Spawner.Z"));
 
         Map<TeamColor, Map<Integer, Location>> playerSpawns = new LinkedHashMap<>();
