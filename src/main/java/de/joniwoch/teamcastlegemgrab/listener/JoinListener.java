@@ -3,7 +3,7 @@ package de.joniwoch.teamcastlegemgrab.listener;
 import de.joniwoch.teamcastlegemgrab.TeamcastleGemgrab;
 import de.joniwoch.teamcastlegemgrab.manager.items.lobbyitems.LobbyItemManager;
 import de.joniwoch.teamcastlegemgrab.manager.locations.LobbyLocationManager;
-import de.joniwoch.teamcastlegemgrab.scoreboard.LobbyScoreboard;
+import de.joniwoch.teamcastlegemgrab.scoreboard.Scoreboard;
 import de.joniwoch.teamcastlegemgrab.utils.Messages;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.GameMode;
@@ -20,6 +20,7 @@ public class JoinListener implements Listener {
 
     private final LobbyItemManager lobbyItemManager;
     private final LobbyLocationManager lobbyLocationManager;
+    private final Scoreboard scoreboard;
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
@@ -43,6 +44,6 @@ public class JoinListener implements Listener {
         player.setExp((float) Calendar.getInstance().get(Calendar.DAY_OF_YEAR) / 365);
         player.sendTitle("§4§lGem§c§lGrab", "§aViel Spaß!");
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 3);
-        LobbyScoreboard.setScoreboard(player);
+        scoreboard.setScoreboard(player);
     }
 }

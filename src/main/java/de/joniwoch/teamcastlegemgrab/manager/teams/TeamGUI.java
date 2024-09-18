@@ -30,22 +30,26 @@ public class TeamGUI {
 
         teamManager.teams.forEach(gemgrabTeam -> {
 
-            String teamName = "§7Team " + gemgrabTeam.getName() + " " + "§7(§e" + gemgrabTeam.getPlayers().size() + "§8/§e" + GameSettings.getTeamSize() + "§7)";;
+            String teamName = "§7Team " + gemgrabTeam.getName() + " " + "§7(" + gemgrabTeam.getPlayers().size() + "§8/§7" + GameSettings.getTeamSize() + "§7)";;
             Material teamMaterial = gemgrabTeam.getMaterial();
             List<String> teamLore = new CopyOnWriteArrayList<>();
             teamLore.add(" ");
 
             for (int i = 0; i < GameSettings.getTeamSize(); i++) {
                 if (gemgrabTeam.getPlayers().isEmpty()) {
-                    teamLore.add("§7-");
+                    teamLore.add("§7»");
                 } else if (i < gemgrabTeam.getPlayers().size()) {
-                    teamLore.add("§7- §d" + Bukkit.getPlayer(gemgrabTeam.getPlayers().get(i)).getName());
+                    teamLore.add("§7» §a" + Bukkit.getPlayer(gemgrabTeam.getPlayers().get(i)).getName());
                 } else {
-                    teamLore.add("§7-");
+                    teamLore.add("§7»");
                 }
             }
 
+            teamLore.add(" ");
+            teamLore.add("§7Klicke um Team " + gemgrabTeam.getName() + " §7beizutreten!");
+
             inv.addItem(new ItemAPI(teamName, teamMaterial, 1, teamLore).build());
+            inv.setItem(22, new ItemAPI("§cTeam verlassen", Material.BARRIER, 1).build());
         });
 
         player.openInventory(inv);

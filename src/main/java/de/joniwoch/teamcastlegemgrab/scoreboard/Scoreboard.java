@@ -1,14 +1,20 @@
 package de.joniwoch.teamcastlegemgrab.scoreboard;
 
 import de.joniwoch.teamcastlegemgrab.manager.game.GameSettings;
+import de.joniwoch.teamcastlegemgrab.manager.teams.TeamManager;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 
-public class LobbyScoreboard {
-    public static void setScoreboard(Player player) {
+@RequiredArgsConstructor
+public class Scoreboard {
+
+    private final TeamManager teamManager;
+
+    public void setScoreboard(Player player) {
         ScoreboardManager manager = Bukkit.getScoreboardManager();
-        Scoreboard scoreboard = manager.getNewScoreboard();
+        org.bukkit.scoreboard.Scoreboard scoreboard = manager.getNewScoreboard();
         int onlinePlayers = Bukkit.getOnlinePlayers().size();
 
         Objective objective = scoreboard.registerNewObjective("test", "dummy", "  §4Gem§cGrab  ");
@@ -18,16 +24,16 @@ public class LobbyScoreboard {
         onlineplayers.addEntry("§3");
         onlineplayers.setPrefix("§2" + onlinePlayers + "§7/§4" + GameSettings.getTeamSize() * 2);
 
-        Team playerRole = scoreboard.registerNewTeam("role");
+        Team playerRole = scoreboard.registerNewTeam("team");
         playerRole.addEntry("§4");
-        playerRole.setPrefix("§cSOON");
+        playerRole.setPrefix(teamManager.getPlayerTeamDisplay(player.getUniqueId()));
 
         Score s1 = objective.getScore(" ");
         Score s2 = objective.getScore("§7Willkommen§8:");
         Score s3 = objective.getScore("§a" + player.getName());
         Score s4 = objective.getScore("     ");
         Score s5 = objective.getScore("§7Team§8:");
-        Score s6 = objective.getScore("§e-");
+        Score s6 = objective.getScore("§4");
         Score s7 = objective.getScore("  ");
         Score s8 = objective.getScore("§7Online§8:");
         Score s9 = objective.getScore("§3");
@@ -50,25 +56,25 @@ public class LobbyScoreboard {
         player.setScoreboard(scoreboard);
     }
 
-    public static void update(Player player) {
-        Scoreboard scoreboard = player.getScoreboard();
+    public void update(Player player) {
+        org.bukkit.scoreboard.Scoreboard scoreboard = player.getScoreboard();
         Objective objective = scoreboard.getObjective("test");
         int onlinePlayers = Bukkit.getOnlinePlayers().size();
 
         Team onlineplayers = scoreboard.getTeam("onlineplayers");
         onlineplayers.addEntry("§3");
-        onlineplayers.setPrefix("§2" + onlinePlayers + "§7/§412");
+        onlineplayers.setPrefix("§2" + onlinePlayers + "§7/§4" + GameSettings.getTeamSize() * 2);
 
-        Team playerRole = scoreboard.getTeam("role");
+        Team playerRole = scoreboard.getTeam("team");
         playerRole.addEntry("§4");
-        playerRole.setPrefix("§cSOON");
+        playerRole.setPrefix(teamManager.getPlayerTeamDisplay(player.getUniqueId()));
 
         Score s1 = objective.getScore(" ");
         Score s2 = objective.getScore("§7Willkommen§8:");
         Score s3 = objective.getScore("§a" + player.getName());
         Score s4 = objective.getScore("     ");
         Score s5 = objective.getScore("§7Team§8:");
-        Score s6 = objective.getScore("§e-");
+        Score s6 = objective.getScore("§4");
         Score s7 = objective.getScore("  ");
         Score s8 = objective.getScore("§7Online§8:");
         Score s9 = objective.getScore("§3");

@@ -1,5 +1,6 @@
 package de.joniwoch.teamcastlegemgrab;
 
+import de.joniwoch.teamcastlegemgrab.commands.CreateMapCommand;
 import de.joniwoch.teamcastlegemgrab.commands.SetLobbySpawnCommand;
 import de.joniwoch.teamcastlegemgrab.listener.JoinListener;
 import de.joniwoch.teamcastlegemgrab.listener.PlayerListener;
@@ -8,7 +9,9 @@ import de.joniwoch.teamcastlegemgrab.manager.game.GameSettings;
 import de.joniwoch.teamcastlegemgrab.manager.game.Gamestate;
 import de.joniwoch.teamcastlegemgrab.manager.items.lobbyitems.LobbyItemManager;
 import de.joniwoch.teamcastlegemgrab.manager.locations.LobbyLocationManager;
+import de.joniwoch.teamcastlegemgrab.manager.locations.map.GameMapManager;
 import de.joniwoch.teamcastlegemgrab.manager.teams.TeamManager;
+import de.joniwoch.teamcastlegemgrab.scoreboard.Scoreboard;
 import de.joniwoch.teamcastlegemgrab.utils.Config;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +34,8 @@ public final class TeamcastleGemgrab extends JavaPlugin {
     private LobbyItemManager lobbyItemManager;
     private TeamManager teamManager;
     private LobbyLocationManager lobbyLocationManager;
+    private Scoreboard scoreboard;
+    private GameMapManager gameMapManager;
 
 
     @Override
@@ -42,6 +47,8 @@ public final class TeamcastleGemgrab extends JavaPlugin {
         this.lobbyItemManager = new LobbyItemManager();
         this.teamManager = new TeamManager();
         this.lobbyLocationManager = new LobbyLocationManager();
+        this.scoreboard = new Scoreboard(teamManager);
+        this.gameMapManager = new GameMapManager();
 
         registerListener();
         registerCommands();
@@ -53,17 +60,31 @@ public final class TeamcastleGemgrab extends JavaPlugin {
         this.teamManager.registerTeams();
         this.lobbyLocationManager.cacheLobbyLocation();
         GameSettings.setTeamSize(3);
+        updateScoreboard();
+    }
+
+    public void updateScoreboard() {
+        Bukkit.getScheduler().runTaskTimer(this, ()-> {
+            switch (gamestate) {
+                case LOBBY -> {
+                    Bukkit.getOnlinePlayers().forEach(player -> {
+                        this.scoreboard.update(player);
+                    });
+                }
+            }
+        }, 0, 20);
     }
 
     public void registerListener() {
         PluginManager manager = Bukkit.getPluginManager();
-        manager.registerEvents(new JoinListener(lobbyItemManager, lobbyLocationManager), this);
+        manager.registerEvents(new JoinListener(lobbyItemManager, lobbyLocationManager, scoreboard), this);
         manager.registerEvents(new PlayerListener(teamManager), this);
         manager.registerEvents(new WorldListener(), this);
     }
 
     public void registerCommands() {
         getCommand("setlobbyspawn").setExecutor(new SetLobbySpawnCommand(lobbyLocationManager));
+        getCommand("createmap").setExecutor(new CreateMapCommand(gameMapManager));
     }
 
     public void setWorldSettings() {

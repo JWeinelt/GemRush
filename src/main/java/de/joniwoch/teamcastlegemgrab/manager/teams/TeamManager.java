@@ -1,5 +1,6 @@
 package de.joniwoch.teamcastlegemgrab.manager.teams;
 
+import de.joniwoch.teamcastlegemgrab.manager.game.GameSettings;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -19,6 +20,43 @@ public class TeamManager {
     public GemgrabTeam getTeamByColor(TeamColor teamColor) {
         for (GemgrabTeam gemgrabTeam : teams) {
             if (gemgrabTeam.getTeamColor().equals(teamColor)) {
+                return gemgrabTeam;
+            }
+        }
+        return null;
+    }
+
+    public String getPlayerTeamDisplay(UUID player) {
+        if (isInTeam(player)) {
+            for (GemgrabTeam gemgrabTeam : teams) {
+                if (gemgrabTeam.getPlayers().contains(player)) {
+                    return gemgrabTeam.getName();
+                }
+            }
+        } else {
+            return "§e-";
+        }
+        return "";
+    }
+
+    public GemgrabTeam getPlayerTeam(UUID player) {
+        if (isInTeam(player)) {
+            for (GemgrabTeam gemgrabTeam : teams) {
+                if (gemgrabTeam.getPlayers().contains(player)) {
+                    return gemgrabTeam;
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean isFull(GemgrabTeam team) {
+        return team.getPlayers().size() >= GameSettings.getTeamSize();
+    }
+
+    public GemgrabTeam getTeamByName(String name) {
+        for (GemgrabTeam gemgrabTeam : teams) {
+            if (gemgrabTeam.getName().equals(name)) {
                 return gemgrabTeam;
             }
         }

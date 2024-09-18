@@ -5,3 +5,9 @@ Locations:
     Z: 0
     Yaw: 0
     Pitch: 0
+Map:
+  Name:
+  Spawner:
+  Spawns:
+    BLUE:
+    RED:
