@@ -1,9 +1,13 @@
 package de.joniwoch.teamcastlegemgrab.manager.locations.map;
 
+import de.joniwoch.teamcastlegemgrab.TeamcastleGemgrab;
+import de.joniwoch.teamcastlegemgrab.manager.teams.GemgrabTeam;
 import de.joniwoch.teamcastlegemgrab.manager.teams.TeamColor;
+import de.joniwoch.teamcastlegemgrab.manager.teams.TeamManager;
 import de.joniwoch.teamcastlegemgrab.utils.Config;
 import de.joniwoch.teamcastlegemgrab.utils.Messages;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -14,11 +18,64 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@RequiredArgsConstructor
 public class GameMapManager {
 
     @Getter
     @Setter
     public GameMap gameMap;
+
+    private final TeamManager teamManager;
+
+    public void teleportGameMap(Player player) {
+        GemgrabTeam team = teamManager.getPlayerTeam(player.getUniqueId());
+        if (team == null) {
+            Bukkit.getLogger().warning("Team für Spieler " + player.getName() + " nicht gefunden.");
+            return;
+        }
+
+        TeamColor teamColor = team.getTeamColor();
+        if (teamColor == null) {
+            Bukkit.getLogger().warning("Teamfarbe für Spieler " + player.getName() + " nicht gefunden.");
+            return;
+        }
+
+        GameMap gameMap = getGameMap();
+        if (gameMap == null) {
+            Bukkit.getLogger().warning("GameMap ist null.");
+            return;
+        }
+
+        Map<TeamColor, Map<Integer, Location>> playerSpawns = gameMap.getPlayerSpawns();
+        if (playerSpawns == null) {
+            Bukkit.getLogger().warning("PlayerSpawns Map ist null.");
+            return;
+        }
+
+        if (!playerSpawns.containsKey(teamColor)) {
+            Bukkit.getLogger().warning("TeamColor " + teamColor + " hat keine zugeordneten Spawns.");
+            return;
+        }
+
+        int playerIndex = team.getPlayers().indexOf(player.getUniqueId()) + 1;
+        if (playerIndex == -1) {
+            Bukkit.getLogger().warning("Spieler " + player.getName() + " nicht im Team gefunden.");
+            return;
+        }
+
+        Map<Integer, Location> spawnsForTeam = playerSpawns.get(teamColor);
+        if (!spawnsForTeam.containsKey(playerIndex)) {
+            Bukkit.getLogger().warning("Kein Spawn für Spielerindex " + playerIndex + " im Team " + teamColor + ".");
+            return;
+        }
+
+        Location spawnLocation = spawnsForTeam.get(playerIndex);
+        if (spawnLocation == null) {
+            Bukkit.getLogger().warning("Spawn-Location für Spieler " + player.getName() + " konnte nicht gefunden werden.");
+            return;
+        }
+        player.teleport(spawnLocation);
+    }
 
     public void createMap(Player player, String mapname) {
         Location location = player.getTargetBlock(null, 0).getLocation();
@@ -81,6 +138,10 @@ public class GameMapManager {
                     Config.getString("Map.Name"),
                     playerSpawns
             ));
+            TeamcastleGemgrab.setGameMap(new GameMap(
+                    spawner,
+                    Config.getString("Map.Name"),
+                    playerSpawns));
         }
     }
 }

@@ -9,11 +9,13 @@ import de.joniwoch.teamcastlegemgrab.listener.PlayerListener;
 import de.joniwoch.teamcastlegemgrab.listener.QuitListener;
 import de.joniwoch.teamcastlegemgrab.listener.WorldListener;
 import de.joniwoch.teamcastlegemgrab.manager.game.GameSettings;
-import de.joniwoch.teamcastlegemgrab.manager.game.GameStartHandler;
+import de.joniwoch.teamcastlegemgrab.manager.game.gameplay.PlayerDeathHandler;
+import de.joniwoch.teamcastlegemgrab.manager.game.start.GameStartHandler;
 import de.joniwoch.teamcastlegemgrab.manager.game.Gamestate;
 import de.joniwoch.teamcastlegemgrab.manager.items.gameitems.GameItemManager;
 import de.joniwoch.teamcastlegemgrab.manager.items.lobbyitems.LobbyItemManager;
 import de.joniwoch.teamcastlegemgrab.manager.locations.LobbyLocationManager;
+import de.joniwoch.teamcastlegemgrab.manager.locations.map.GameMap;
 import de.joniwoch.teamcastlegemgrab.manager.locations.map.GameMapManager;
 import de.joniwoch.teamcastlegemgrab.manager.teams.TeamManager;
 import de.joniwoch.teamcastlegemgrab.scoreboard.Scoreboard;
@@ -36,6 +38,10 @@ public final class TeamcastleGemgrab extends JavaPlugin {
     @Setter
     private static Gamestate gamestate;
 
+    @Getter
+    @Setter
+    private static GameMap gameMap;
+
     private LobbyItemManager lobbyItemManager;
     private TeamManager teamManager;
     private LobbyLocationManager lobbyLocationManager;
@@ -43,6 +49,7 @@ public final class TeamcastleGemgrab extends JavaPlugin {
     private GameMapManager gameMapManager;
     private GameItemManager gameItemManager;
     private GameStartHandler gameStartHandler;
+    private PlayerDeathHandler playerDeathHandler;
 
 
     @Override
@@ -54,11 +61,12 @@ public final class TeamcastleGemgrab extends JavaPlugin {
         this.lobbyItemManager = new LobbyItemManager();
         this.teamManager = new TeamManager();
         this.lobbyLocationManager = new LobbyLocationManager();
-        this.gameMapManager = new GameMapManager();
+        this.gameMapManager = new GameMapManager(teamManager);
         this.gameMapManager.cacheGameMap();
         this.gameItemManager = new GameItemManager(teamManager);
-        this.gameStartHandler = new GameStartHandler(teamManager, gameMapManager, gameItemManager);
+        this.gameStartHandler = new GameStartHandler(gameMapManager, gameItemManager);
         this.scoreboard = new Scoreboard(teamManager, gameMapManager);
+        this.playerDeathHandler = new PlayerDeathHandler(gameMapManager, gameItemManager);
 
 
         registerListener();
@@ -71,6 +79,9 @@ public final class TeamcastleGemgrab extends JavaPlugin {
         this.teamManager.registerTeams();
         this.lobbyLocationManager.cacheLobbyLocation();
         GameSettings.setTeamSize(3);
+        GameSettings.setGemCooldown(15);
+        GameSettings.setStartCountdown(10);
+        GameSettings.setRespawnTimer(5);
         updateScoreboard();
     }
 
@@ -82,6 +93,11 @@ public final class TeamcastleGemgrab extends JavaPlugin {
                         this.scoreboard.update(player);
                     });
                 }
+//                case STARTING -> {
+//                    Bukkit.getOnlinePlayers().forEach(player -> {
+//                        this.scoreboard.updateGame(player);
+//                    });
+//                }
             }
         }, 0, 20);
     }
@@ -89,7 +105,7 @@ public final class TeamcastleGemgrab extends JavaPlugin {
     public void registerListener() {
         PluginManager manager = Bukkit.getPluginManager();
         manager.registerEvents(new JoinListener(lobbyItemManager, lobbyLocationManager, scoreboard), this);
-        manager.registerEvents(new PlayerListener(teamManager), this);
+        manager.registerEvents(new PlayerListener(teamManager, playerDeathHandler), this);
         manager.registerEvents(new WorldListener(), this);
         manager.registerEvents(new QuitListener(teamManager), this);
     }

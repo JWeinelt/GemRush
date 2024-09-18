@@ -2,22 +2,27 @@ package de.joniwoch.teamcastlegemgrab.listener;
 
 import de.joniwoch.teamcastlegemgrab.TeamcastleGemgrab;
 import de.joniwoch.teamcastlegemgrab.manager.game.Gamestate;
+import de.joniwoch.teamcastlegemgrab.manager.game.gameplay.PlayerDeathHandler;
 import de.joniwoch.teamcastlegemgrab.manager.teams.GemgrabTeam;
 import de.joniwoch.teamcastlegemgrab.manager.teams.TeamGUI;
 import de.joniwoch.teamcastlegemgrab.manager.teams.TeamManager;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.Inventory;
 
@@ -25,6 +30,7 @@ import org.bukkit.inventory.Inventory;
 public class PlayerListener implements Listener {
 
     private final TeamManager teamManager;
+    private final PlayerDeathHandler playerDeathHandler;
 
     @EventHandler
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
@@ -34,6 +40,67 @@ public class PlayerListener implements Listener {
                 player.setFoodLevel(20);
             }
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageEvent event) {
+        Gamestate gamestate = TeamcastleGemgrab.getGamestate();
+        if (event.getEntity() instanceof Player player) {
+            switch (gamestate) {
+                case LOBBY:
+                case STARTING:
+                case ENDED:
+                    event.setCancelled(true);
+                    break;
+                case INGAME:
+                    if (player.getHealth() - event.getFinalDamage() <= 0) {
+                        playerDeathHandler.setPlayerDead(player);
+                    }
+                    break;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onDamageByEntity(EntityDamageByEntityEvent event) {
+        Gamestate gamestate = TeamcastleGemgrab.getGamestate();
+        switch (gamestate) {
+            case INGAME:
+                Player killer;
+                if (event.getEntity() instanceof Player player && (event.getDamager() instanceof Player || event.getDamager() instanceof Arrow)) {
+                    if (event.getDamager() instanceof Player) {
+                        killer = (Player) event.getDamager();
+                        if (playerDeathHandler.deadPlayers.contains(killer)) {
+                            event.setCancelled(true);
+                            return;
+                        }
+                        if (player.getHealth() - event.getFinalDamage() <= 0) {
+                            playerDeathHandler.setPlayerDead(player, killer);
+                        }
+                    }
+                    if (event.getDamager() instanceof Arrow) {
+                        killer = (Player) ((Arrow) event.getDamager()).getShooter();
+                        if (player.getHealth() - event.getFinalDamage() <= 0) {
+                            playerDeathHandler.setPlayerDead(player, killer);
+                        }
+                    }
+                } else {
+                    event.setCancelled(true);
+                }
+                break;
+        }
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent event) {
+        if (TeamcastleGemgrab.getGamestate().equals(Gamestate.STARTING)) {
+            Location currentLocation = event.getFrom();
+            Location targetLocation = event.getTo();
+            if (currentLocation.getBlockX() != targetLocation.getBlockX() ||
+                    currentLocation.getBlockZ() != targetLocation.getBlockZ()) {
+                event.setTo(currentLocation);
+            }
         }
     }
 
@@ -122,21 +189,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onDropItem(PlayerDropItemEvent event) {
-        Player player = event.getPlayer();
-        switch (TeamcastleGemgrab.getGamestate()) {
-            case LOBBY -> {
-                event.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onDamage(EntityDamageEvent event) {
-        switch (TeamcastleGemgrab.getGamestate()) {
-            case LOBBY -> {
-                event.setCancelled(true);
-            }
-        }
+        event.setCancelled(true);
     }
 
     @EventHandler
@@ -148,5 +201,4 @@ public class PlayerListener implements Listener {
             }
         }
     }
-
 }

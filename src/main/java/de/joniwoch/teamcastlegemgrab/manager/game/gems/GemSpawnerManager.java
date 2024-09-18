@@ -1,7 +1,10 @@
 package de.joniwoch.teamcastlegemgrab.manager.game.gems;
 
 import de.joniwoch.teamcastlegemgrab.TeamcastleGemgrab;
+import de.joniwoch.teamcastlegemgrab.manager.game.GameSettings;
+import de.joniwoch.teamcastlegemgrab.manager.items.ItemAPI;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
@@ -12,6 +15,23 @@ import org.bukkit.util.EulerAngle;
 
 @UtilityClass
 public class GemSpawnerManager {
+
+    public ArmorStand textStand2 = null;
+    private int gemCountdown = GameSettings.getGemCooldown();
+
+
+    public void spawnGems(Location location) {
+        Location spawnLocation = location.clone().add(0.5, 1, 0.5);
+        Bukkit.getScheduler().runTaskTimer(TeamcastleGemgrab.getInstance(), ()-> {
+            if (gemCountdown > 1) {
+                gemCountdown--;
+            } else {
+                gemCountdown = GameSettings.getGemCooldown();
+                Bukkit.getWorld("world").dropItem(spawnLocation, new ItemAPI("§2§lGEM", Material.EMERALD, 1).build());
+            }
+            textStand2.setCustomName("§7Erscheint in §c" + gemCountdown + " §7Sekunden");
+        }, 0, 20);
+    }
 
     public void createGemSpawner(Location location) {
         Location spawnLocation = location.clone().add(0.5, 1.5, 0.5);
@@ -31,8 +51,8 @@ public class GemSpawnerManager {
         textStand.setGravity(false);
         textStand.setMarker(true);
 
-        ArmorStand textStand2 = (ArmorStand) location.getWorld().spawnEntity(spawnLocation.clone().add(0, 2.2, 0), EntityType.ARMOR_STAND);
-        textStand2.setCustomName("§7Erscheint in §c5 §7Sekunden");
+        textStand2 = (ArmorStand) location.getWorld().spawnEntity(spawnLocation.clone().add(0, 2.2, 0), EntityType.ARMOR_STAND);
+        textStand2.setCustomName("§7Erscheint in §c " + GameSettings.getGemCooldown() + " §7Sekunden");
         textStand2.setCustomNameVisible(true);
         textStand2.setVisible(false);
         textStand2.setInvulnerable(true);

@@ -19,19 +19,11 @@ public class WorldListener implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        switch (TeamcastleGemgrab.getGamestate()) {
-            case LOBBY -> {
-                event.setCancelled(true);
-            }
-        }
+        event.setCancelled(true);
     }
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        switch (TeamcastleGemgrab.getGamestate()) {
-            case LOBBY -> {
-                event.setCancelled(true);
-            }
-        }
+        event.setCancelled(true);
     }
 }

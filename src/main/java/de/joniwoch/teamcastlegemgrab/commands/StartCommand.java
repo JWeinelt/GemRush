@@ -1,9 +1,6 @@
 package de.joniwoch.teamcastlegemgrab.commands;
 
-import de.joniwoch.teamcastlegemgrab.manager.game.GameStartHandler;
-import de.joniwoch.teamcastlegemgrab.manager.locations.map.GameMap;
-import de.joniwoch.teamcastlegemgrab.manager.locations.map.GameMapManager;
-import de.joniwoch.teamcastlegemgrab.manager.teams.TeamColor;
+import de.joniwoch.teamcastlegemgrab.manager.game.start.GameStartHandler;
 import de.joniwoch.teamcastlegemgrab.utils.Messages;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.command.Command;
