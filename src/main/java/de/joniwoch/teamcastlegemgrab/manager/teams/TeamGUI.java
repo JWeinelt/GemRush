@@ -1,9 +1,8 @@
 package de.joniwoch.teamcastlegemgrab.manager.teams;
 
 import de.joniwoch.teamcastlegemgrab.manager.game.GameSettings;
-import de.joniwoch.teamcastlegemgrab.utils.ItemAPI;
+import de.joniwoch.teamcastlegemgrab.manager.items.ItemAPI;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

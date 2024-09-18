@@ -1,12 +1,16 @@
 package de.joniwoch.teamcastlegemgrab;
 
 import de.joniwoch.teamcastlegemgrab.commands.CreateMapCommand;
+import de.joniwoch.teamcastlegemgrab.commands.SetGameSpawnCommand;
 import de.joniwoch.teamcastlegemgrab.commands.SetLobbySpawnCommand;
+import de.joniwoch.teamcastlegemgrab.commands.StartCommand;
 import de.joniwoch.teamcastlegemgrab.listener.JoinListener;
 import de.joniwoch.teamcastlegemgrab.listener.PlayerListener;
 import de.joniwoch.teamcastlegemgrab.listener.WorldListener;
 import de.joniwoch.teamcastlegemgrab.manager.game.GameSettings;
+import de.joniwoch.teamcastlegemgrab.manager.game.GameStartHandler;
 import de.joniwoch.teamcastlegemgrab.manager.game.Gamestate;
+import de.joniwoch.teamcastlegemgrab.manager.items.gameitems.GameItemManager;
 import de.joniwoch.teamcastlegemgrab.manager.items.lobbyitems.LobbyItemManager;
 import de.joniwoch.teamcastlegemgrab.manager.locations.LobbyLocationManager;
 import de.joniwoch.teamcastlegemgrab.manager.locations.map.GameMapManager;
@@ -36,6 +40,8 @@ public final class TeamcastleGemgrab extends JavaPlugin {
     private LobbyLocationManager lobbyLocationManager;
     private Scoreboard scoreboard;
     private GameMapManager gameMapManager;
+    private GameItemManager gameItemManager;
+    private GameStartHandler gameStartHandler;
 
 
     @Override
@@ -47,8 +53,12 @@ public final class TeamcastleGemgrab extends JavaPlugin {
         this.lobbyItemManager = new LobbyItemManager();
         this.teamManager = new TeamManager();
         this.lobbyLocationManager = new LobbyLocationManager();
-        this.scoreboard = new Scoreboard(teamManager);
         this.gameMapManager = new GameMapManager();
+        this.gameMapManager.cacheGameMap();
+        this.gameItemManager = new GameItemManager(teamManager);
+        this.gameStartHandler = new GameStartHandler(teamManager, gameMapManager, gameItemManager);
+        this.scoreboard = new Scoreboard(teamManager, gameMapManager);
+
 
         registerListener();
         registerCommands();
@@ -85,6 +95,8 @@ public final class TeamcastleGemgrab extends JavaPlugin {
     public void registerCommands() {
         getCommand("setlobbyspawn").setExecutor(new SetLobbySpawnCommand(lobbyLocationManager));
         getCommand("createmap").setExecutor(new CreateMapCommand(gameMapManager));
+        getCommand("setgamespawn").setExecutor(new SetGameSpawnCommand(gameMapManager));
+        getCommand("start").setExecutor(new StartCommand(gameStartHandler));
     }
 
     public void setWorldSettings() {

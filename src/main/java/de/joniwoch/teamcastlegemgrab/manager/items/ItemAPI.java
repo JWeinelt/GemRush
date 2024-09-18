@@ -19,6 +19,14 @@ public class ItemAPI {
         this.itemMeta.setDisplayName(name);
     }
 
+    public ItemAPI(String name, Material material, int amount, boolean unbreakable) {
+        this.itemStack = new ItemStack(material, amount);
+        this.itemMeta = this.itemStack.getItemMeta();
+        this.itemMeta.setUnbreakable(true);
+        this.itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        this.itemMeta.setDisplayName(name);
+    }
+
     public ItemAPI(String name, Material material, int amount, byte b) {
         this.itemStack = new ItemStack(material, amount, b);
         this.itemMeta = this.itemStack.getItemMeta();

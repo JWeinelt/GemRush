@@ -1,6 +1,6 @@
 package de.joniwoch.teamcastlegemgrab.manager.items.lobbyitems;
 
-import de.joniwoch.teamcastlegemgrab.utils.ItemAPI;
+import de.joniwoch.teamcastlegemgrab.manager.items.ItemAPI;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
