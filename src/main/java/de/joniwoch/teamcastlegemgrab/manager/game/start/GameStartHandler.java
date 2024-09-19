@@ -2,6 +2,7 @@ package de.joniwoch.teamcastlegemgrab.manager.game.start;
 
 import de.joniwoch.teamcastlegemgrab.TeamcastleGemgrab;
 import de.joniwoch.teamcastlegemgrab.manager.game.Gamestate;
+import de.joniwoch.teamcastlegemgrab.manager.game.gems.GemManager;
 import de.joniwoch.teamcastlegemgrab.manager.game.gems.GemSpawnerManager;
 import de.joniwoch.teamcastlegemgrab.manager.items.gameitems.GameItemManager;
 import de.joniwoch.teamcastlegemgrab.manager.locations.map.GameMap;
@@ -23,6 +24,7 @@ public class GameStartHandler {
 
     private final GameMapManager gameMapManager;
     private final GameItemManager gameItemManager;
+    private final GemManager gemManager;
 
     public void startGame() {
         Bukkit.getOnlinePlayers().forEach(player -> {

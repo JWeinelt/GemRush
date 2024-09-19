@@ -3,8 +3,11 @@ package de.joniwoch.teamcastlegemgrab.manager.game.start;
 
 import de.joniwoch.teamcastlegemgrab.TeamcastleGemgrab;
 import de.joniwoch.teamcastlegemgrab.manager.game.Gamestate;
+import de.joniwoch.teamcastlegemgrab.manager.game.gameplay.BossbarHandler;
+import de.joniwoch.teamcastlegemgrab.manager.game.gems.GemManager;
 import de.joniwoch.teamcastlegemgrab.manager.game.gems.GemSpawnerManager;
 import de.joniwoch.teamcastlegemgrab.manager.locations.map.GameMapManager;
+import de.joniwoch.teamcastlegemgrab.manager.teams.TeamManager;
 import de.joniwoch.teamcastlegemgrab.utils.Messages;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
@@ -37,6 +40,7 @@ public class GameStartCountdown {
                     Bukkit.getScheduler().cancelTask(taskIdHolder[0]);
                     TeamcastleGemgrab.setGamestate(Gamestate.INGAME);
                     GemSpawnerManager.spawnGems(TeamcastleGemgrab.getGameMap().getSpawner());
+                    BossbarHandler.setDefaultBossbar();
                 }
             }
         }, 0L, 20L).getTaskId();

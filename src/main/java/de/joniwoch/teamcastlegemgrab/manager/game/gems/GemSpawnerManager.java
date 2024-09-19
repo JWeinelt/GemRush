@@ -65,7 +65,7 @@ public class GemSpawnerManager {
 
             @Override
             public void run() {
-                angle += 3;
+                angle += 5;
                 double yOffset = Math.sin(ticks / 10.0) * 0.15;
                 ticks += 1;
 
