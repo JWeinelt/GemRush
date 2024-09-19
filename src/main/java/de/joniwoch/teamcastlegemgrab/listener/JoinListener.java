@@ -3,6 +3,7 @@ package de.joniwoch.teamcastlegemgrab.listener;
 import de.joniwoch.teamcastlegemgrab.TeamcastleGemgrab;
 import de.joniwoch.teamcastlegemgrab.manager.items.lobbyitems.LobbyItemManager;
 import de.joniwoch.teamcastlegemgrab.manager.locations.LobbyLocationManager;
+import de.joniwoch.teamcastlegemgrab.manager.player.GemgrabPlayerManager;
 import de.joniwoch.teamcastlegemgrab.scoreboard.Scoreboard;
 import de.joniwoch.teamcastlegemgrab.utils.Messages;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class JoinListener implements Listener {
     }
 
     public void doLobbyJoin(Player player) {
+        GemgrabPlayerManager.addGemgrabPlayer(player);
         lobbyItemManager.setLobbyItems(player);
         lobbyLocationManager.teleportLobbySpawn(player);
         player.setGameMode(GameMode.SURVIVAL);

@@ -3,6 +3,8 @@ package de.joniwoch.teamcastlegemgrab.listener;
 import de.joniwoch.teamcastlegemgrab.TeamcastleGemgrab;
 import de.joniwoch.teamcastlegemgrab.manager.game.Gamestate;
 import de.joniwoch.teamcastlegemgrab.manager.game.gameplay.PlayerDeathHandler;
+import de.joniwoch.teamcastlegemgrab.manager.player.GemgrabPlayer;
+import de.joniwoch.teamcastlegemgrab.manager.player.GemgrabPlayerManager;
 import de.joniwoch.teamcastlegemgrab.manager.teams.GemgrabTeam;
 import de.joniwoch.teamcastlegemgrab.manager.teams.TeamGUI;
 import de.joniwoch.teamcastlegemgrab.manager.teams.TeamManager;
@@ -19,6 +21,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -44,6 +47,11 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
+    public void onDeath(PlayerDeathEvent event) {
+        event.setDeathMessage(null);
+    }
+
+    @EventHandler
     public void onDamage(EntityDamageEvent event) {
         Gamestate gamestate = TeamcastleGemgrab.getGamestate();
         if (event.getEntity() instanceof Player player) {
@@ -54,8 +62,12 @@ public class PlayerListener implements Listener {
                     event.setCancelled(true);
                     break;
                 case INGAME:
-                    if (player.getHealth() - event.getFinalDamage() <= 0) {
-                        playerDeathHandler.setPlayerDead(player);
+                    GemgrabPlayer gemgrabPlayer = GemgrabPlayerManager.getGemgrabPlayerByUUID(player.getUniqueId());
+                    if (!gemgrabPlayer.isDead()) {
+                        if (player.getHealth() - event.getFinalDamage() <= 0) {
+                            playerDeathHandler.setPlayerDead(player);
+                            event.setCancelled(true);
+                        }
                     }
                     break;
             }
@@ -71,18 +83,31 @@ public class PlayerListener implements Listener {
                 if (event.getEntity() instanceof Player player && (event.getDamager() instanceof Player || event.getDamager() instanceof Arrow)) {
                     if (event.getDamager() instanceof Player) {
                         killer = (Player) event.getDamager();
-                        if (playerDeathHandler.deadPlayers.contains(killer)) {
+                        GemgrabPlayer gemgrabPlayer = GemgrabPlayerManager.getGemgrabPlayerByUUID(player.getUniqueId());
+                        GemgrabPlayer gemgrabKiller = GemgrabPlayerManager.getGemgrabPlayerByUUID(killer.getUniqueId());
+                        if (gemgrabKiller.isDead()) {
                             event.setCancelled(true);
                             return;
                         }
-                        if (player.getHealth() - event.getFinalDamage() <= 0) {
-                            playerDeathHandler.setPlayerDead(player, killer);
+                        if (!gemgrabPlayer.isDead()) {
+                            gemgrabPlayer.setLastDamager(gemgrabKiller);
+                            if (player.getHealth() - event.getFinalDamage() <= 0) {
+                                playerDeathHandler.setPlayerDead(player, killer);
+                                event.setCancelled(true);
+                            }
                         }
                     }
                     if (event.getDamager() instanceof Arrow) {
                         killer = (Player) ((Arrow) event.getDamager()).getShooter();
-                        if (player.getHealth() - event.getFinalDamage() <= 0) {
-                            playerDeathHandler.setPlayerDead(player, killer);
+                        GemgrabPlayer gemgrabPlayer = GemgrabPlayerManager.getGemgrabPlayerByUUID(player.getUniqueId());
+                        assert killer != null;
+                        GemgrabPlayer gemgrabKiller = GemgrabPlayerManager.getGemgrabPlayerByUUID(killer.getUniqueId());
+                        if (!gemgrabPlayer.isDead()) {
+                            gemgrabPlayer.setLastDamager(gemgrabKiller);
+                            if (player.getHealth() - event.getFinalDamage() <= 0) {
+                                playerDeathHandler.setPlayerDead(player, killer);
+                                event.setCancelled(true);
+                            }
                         }
                     }
                 } else {
@@ -198,6 +223,12 @@ public class PlayerListener implements Listener {
         switch (TeamcastleGemgrab.getGamestate()) {
             case LOBBY -> {
                 event.setCancelled(true);
+            }
+            case STARTING, INGAME -> {
+                GemgrabPlayer gemgrabPlayer = GemgrabPlayerManager.getGemgrabPlayerByUUID(player.getUniqueId());
+                if (gemgrabPlayer.isDead()) {
+                    event.setCancelled(true);
+                }
             }
         }
     }

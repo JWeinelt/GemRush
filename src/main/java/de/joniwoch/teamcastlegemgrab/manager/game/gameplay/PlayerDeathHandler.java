@@ -3,18 +3,18 @@ package de.joniwoch.teamcastlegemgrab.manager.game.gameplay;
 import de.joniwoch.teamcastlegemgrab.TeamcastleGemgrab;
 import de.joniwoch.teamcastlegemgrab.manager.game.Gamestate;
 import de.joniwoch.teamcastlegemgrab.manager.game.gems.GemSpawnerManager;
+import de.joniwoch.teamcastlegemgrab.manager.items.ItemAPI;
 import de.joniwoch.teamcastlegemgrab.manager.items.gameitems.GameItemManager;
 import de.joniwoch.teamcastlegemgrab.manager.locations.map.GameMapManager;
+import de.joniwoch.teamcastlegemgrab.manager.player.GemgrabPlayer;
+import de.joniwoch.teamcastlegemgrab.manager.player.GemgrabPlayerManager;
 import de.joniwoch.teamcastlegemgrab.utils.Messages;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @RequiredArgsConstructor
@@ -23,44 +23,67 @@ public class PlayerDeathHandler {
     private final GameMapManager gameMapManager;
     private final GameItemManager gameItemManager;
 
-    public List<Player> deadPlayers = new CopyOnWriteArrayList<>();
-
     public void setPlayerDead(Player dead, Player killer) {
+        GemgrabPlayer gemgrabPlayerDead = GemgrabPlayerManager.getGemgrabPlayerByUUID(dead.getUniqueId());
         Bukkit.broadcastMessage(Messages.mainPrefix + "Der Spieler §a" + dead.getName() + " §7wurde von §c" + killer.getName() + "§7 getötet!");
         dead.setAllowFlight(true);
+        dead.setFlying(true);
+        dropPlayerGems(dead);
         dead.getInventory().clear();
         dead.getInventory().setArmorContents(null);
         startRespawnCountdown(dead);
-        dead.setHealth(20);
         dead.setFoodLevel(20);
-        deadPlayers.add(dead);
-        hideDead();
+        gemgrabPlayerDead.setLastDamager(null);
+        GemgrabPlayer gemgrabPlayer = GemgrabPlayerManager.getGemgrabPlayerByUUID(dead.getUniqueId());
+        gemgrabPlayer.setDead(true);
+        gemgrabPlayer.setVisibility(false);
+        GemgrabPlayerManager.hidePlayer(gemgrabPlayer);
+        Bukkit.getScheduler().runTaskLater(TeamcastleGemgrab.getInstance(), () -> {
+            dead.setHealth(20);
+            dead.teleport(gameMapManager.getGameMap().getSpawner().clone().add(0.5, 7.0, 0.5));
+            dead.setFlying(true);
+        }, 1L);
     }
 
     public void setPlayerDead(Player dead) {
-        Bukkit.broadcastMessage(Messages.mainPrefix + "Der Spieler §c" + dead.getName() + " §7ist §cgestorben§7!");
+        GemgrabPlayer gemgrabPlayerDead = GemgrabPlayerManager.getGemgrabPlayerByUUID(dead.getUniqueId());
+        if (gemgrabPlayerDead.getLastDamager() == null) {
+            Bukkit.broadcastMessage(Messages.mainPrefix + "Der Spieler §c" + dead.getName() + " §7ist §cgestorben§7!");
+        } else {
+            GemgrabPlayer gemgrabPlayerKiller = gemgrabPlayerDead.getLastDamager();
+            Bukkit.broadcastMessage(Messages.mainPrefix + "Der Spieler §a" + dead.getName() + " §7wurde von §c" + gemgrabPlayerKiller.getName() + "§7 getötet!");
+        }
+        gemgrabPlayerDead.setLastDamager(null);
         dead.setAllowFlight(true);
+        dropPlayerGems(dead);
         dead.getInventory().clear();
         dead.getInventory().setArmorContents(null);
         startRespawnCountdown(dead);
-        dead.setHealth(20);
         dead.setFoodLevel(20);
-        deadPlayers.add(dead);
-        hideDead();
+        GemgrabPlayer gemgrabPlayer = GemgrabPlayerManager.getGemgrabPlayerByUUID(dead.getUniqueId());
+        gemgrabPlayer.setDead(true);
+        gemgrabPlayer.setVisibility(false);
+        GemgrabPlayerManager.hidePlayer(gemgrabPlayer);
+        Bukkit.getScheduler().runTaskLater(TeamcastleGemgrab.getInstance(), () -> {
+            dead.setHealth(20);
+            dead.teleport(gameMapManager.getGameMap().getSpawner().clone().add(0.5, 7.0, 0.5));
+            dead.setFlying(true);
+        }, 1L);
     }
 
-    public void hideDead() {
-        Bukkit.getOnlinePlayers().forEach(player -> {
-            deadPlayers.forEach(player1 -> {
-                player.hidePlayer(player1);
-            });
-        });
-    }
-
-    public void showPlayer(Player player) {
-        Bukkit.getOnlinePlayers().forEach(player1 -> {
-            player1.showPlayer(player);
-        });
+    public void dropPlayerGems(Player player) {
+        int count = 0;
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item != null) {
+                ItemMeta meta = item.getItemMeta();
+                if (meta != null && meta.hasDisplayName()) {
+                    if (meta.getDisplayName().equals("§2§lGEM")) {
+                        count += item.getAmount();
+                    }
+                }
+            }
+        }
+        Bukkit.getWorld("world").dropItemNaturally(player.getLocation(), new ItemAPI("§2§lGEM", Material.EMERALD, count).build());
     }
 
     public void startRespawnCountdown(Player player) {
@@ -80,8 +103,10 @@ public class PlayerDeathHandler {
                     player.setAllowFlight(false);
                     player.setHealth(20);
                     player.setFoodLevel(20);
-                    deadPlayers.remove(player);
-                    showPlayer(player);
+                    GemgrabPlayer gemgrabPlayer = GemgrabPlayerManager.getGemgrabPlayerByUUID(player.getUniqueId());
+                    gemgrabPlayer.setDead(false);
+                    gemgrabPlayer.setVisibility(true);
+                    GemgrabPlayerManager.hidePlayer(gemgrabPlayer);
                 }
             }
         }, 0L, 20L).getTaskId();
