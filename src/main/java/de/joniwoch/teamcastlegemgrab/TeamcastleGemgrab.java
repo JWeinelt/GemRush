@@ -68,7 +68,7 @@ public final class TeamcastleGemgrab extends JavaPlugin {
         this.gameMapManager = new GameMapManager(teamManager);
         this.gameMapManager.cacheGameMap();
         this.gameItemManager = new GameItemManager(teamManager);
-        this.gameStartHandler = new GameStartHandler(gameMapManager, gameItemManager, gemManager);
+        this.gameStartHandler = new GameStartHandler(gameMapManager, gameItemManager, teamManager);
         this.scoreboard = new Scoreboard(teamManager, gameMapManager);
         this.playerDeathHandler = new PlayerDeathHandler(gameMapManager, gameItemManager);
         this.gemManager = new GemManager(teamManager);

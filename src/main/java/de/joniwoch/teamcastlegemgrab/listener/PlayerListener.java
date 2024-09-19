@@ -78,11 +78,17 @@ public class PlayerListener implements Listener {
     public void onDamageByEntity(EntityDamageByEntityEvent event) {
         Gamestate gamestate = TeamcastleGemgrab.getGamestate();
         switch (gamestate) {
-            case INGAME:
+            case INGAME, ENDED:
                 Player killer;
                 if (event.getEntity() instanceof Player player && (event.getDamager() instanceof Player || event.getDamager() instanceof Arrow)) {
                     if (event.getDamager() instanceof Player) {
                         killer = (Player) event.getDamager();
+                        GemgrabTeam gemgrabTeamPlayer = teamManager.getPlayerTeam(player.getUniqueId());
+                        GemgrabTeam gemgrabTeamKiller = teamManager.getPlayerTeam(killer.getUniqueId());
+                        if (gemgrabTeamPlayer == gemgrabTeamKiller) {
+                            event.setCancelled(true);
+                            return;
+                        }
                         GemgrabPlayer gemgrabPlayer = GemgrabPlayerManager.getGemgrabPlayerByUUID(player.getUniqueId());
                         GemgrabPlayer gemgrabKiller = GemgrabPlayerManager.getGemgrabPlayerByUUID(killer.getUniqueId());
                         if (gemgrabKiller.isDead()) {
@@ -99,6 +105,13 @@ public class PlayerListener implements Listener {
                     }
                     if (event.getDamager() instanceof Arrow) {
                         killer = (Player) ((Arrow) event.getDamager()).getShooter();
+                        GemgrabTeam gemgrabTeamPlayer = teamManager.getPlayerTeam(player.getUniqueId());
+                        assert killer != null;
+                        GemgrabTeam gemgrabTeamKiller = teamManager.getPlayerTeam(killer.getUniqueId());
+                        if (gemgrabTeamPlayer == gemgrabTeamKiller) {
+                            event.setCancelled(true);
+                            return;
+                        }
                         GemgrabPlayer gemgrabPlayer = GemgrabPlayerManager.getGemgrabPlayerByUUID(player.getUniqueId());
                         assert killer != null;
                         GemgrabPlayer gemgrabKiller = GemgrabPlayerManager.getGemgrabPlayerByUUID(killer.getUniqueId());
@@ -133,7 +146,7 @@ public class PlayerListener implements Listener {
     public void onClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         switch (TeamcastleGemgrab.getGamestate()) {
-            case LOBBY -> {
+            case LOBBY, ENDED -> {
                 event.setCancelled(true);
             }
         }
@@ -192,7 +205,7 @@ public class PlayerListener implements Listener {
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         switch (TeamcastleGemgrab.getGamestate()) {
-            case LOBBY -> {
+            case LOBBY, ENDED -> {
                 event.setCancelled(true);
             }
         }
@@ -221,7 +234,7 @@ public class PlayerListener implements Listener {
     public void onPickUpItem(PlayerPickupItemEvent event) {
         Player player = event.getPlayer();
         switch (TeamcastleGemgrab.getGamestate()) {
-            case LOBBY -> {
+            case LOBBY, ENDED-> {
                 event.setCancelled(true);
             }
             case STARTING, INGAME -> {

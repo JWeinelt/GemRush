@@ -2,6 +2,7 @@ package de.joniwoch.teamcastlegemgrab.manager.game.gems;
 
 import de.joniwoch.teamcastlegemgrab.TeamcastleGemgrab;
 import de.joniwoch.teamcastlegemgrab.manager.game.GameSettings;
+import de.joniwoch.teamcastlegemgrab.manager.game.Gamestate;
 import de.joniwoch.teamcastlegemgrab.manager.items.ItemAPI;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
@@ -23,13 +24,15 @@ public class GemSpawnerManager {
     public void spawnGems(Location location) {
         Location spawnLocation = location.clone().add(0.5, 1, 0.5);
         Bukkit.getScheduler().runTaskTimer(TeamcastleGemgrab.getInstance(), ()-> {
-            if (gemCountdown > 1) {
-                gemCountdown--;
-            } else {
-                gemCountdown = GameSettings.getGemCooldown();
-                Bukkit.getWorld("world").dropItem(spawnLocation, new ItemAPI("§2§lGEM", Material.EMERALD, 1).build());
+            if (!TeamcastleGemgrab.getGamestate().equals(Gamestate.ENDED)) {
+                if (gemCountdown > 1) {
+                    gemCountdown--;
+                } else {
+                    gemCountdown = GameSettings.getGemCooldown();
+                    Bukkit.getWorld("world").dropItem(spawnLocation, new ItemAPI("§2§lGEM", Material.EMERALD, 1).build());
+                }
+                textStand2.setCustomName("§7Erscheint in §c" + gemCountdown + " §7Sekunden");
             }
-            textStand2.setCustomName("§7Erscheint in §c" + gemCountdown + " §7Sekunden");
         }, 0, 20);
     }
 

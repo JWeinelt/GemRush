@@ -24,9 +24,10 @@ public class GameStartHandler {
 
     private final GameMapManager gameMapManager;
     private final GameItemManager gameItemManager;
-    private final GemManager gemManager;
+    private final TeamManager teamManager;
 
     public void startGame() {
+        teamManager.autofillTeams();
         Bukkit.getOnlinePlayers().forEach(player -> {
             player.setHealth(20);
             player.setFoodLevel(20);
