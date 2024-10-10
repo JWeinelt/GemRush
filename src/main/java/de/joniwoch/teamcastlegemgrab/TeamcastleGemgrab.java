@@ -84,7 +84,7 @@ public final class TeamcastleGemgrab extends JavaPlugin {
         this.teamManager.registerTeams();
         this.lobbyLocationManager.cacheLobbyLocation();
         GameSettings.setTeamSize(3);
-        GameSettings.setGemCooldown(2);
+        GameSettings.setGemCooldown(7);
         GameSettings.setStartCountdown(10);
         GameSettings.setRespawnTimer(5);
         updateScoreboard();
@@ -98,12 +98,10 @@ public final class TeamcastleGemgrab extends JavaPlugin {
                         this.scoreboard.update(player);
                     });
                 }
-//                case STARTING -> {
-//                    Bukkit.getOnlinePlayers().forEach(player -> {
-//                        this.scoreboard.updateGame(player);
-//                    });
-//                }
                 case INGAME -> {
+                    Bukkit.getOnlinePlayers().forEach(player -> {
+                        this.scoreboard.update(player);
+                    });
                     Bukkit.getScheduler().runTaskTimer(TeamcastleGemgrab.getInstance(), () -> {
                         BossbarHandler.defaultBossBar.setTitle("§8| §a§l" + this.gemManager.calculateTeamGemsBlue() + " §7- §1Blau §7----------- §4Rot §7- §a§l" + this.gemManager.calculateTeamGemsRed() + " §8|");
                         this.gemManager.checkForCountdown();
