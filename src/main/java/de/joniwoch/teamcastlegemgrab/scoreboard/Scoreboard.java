@@ -137,7 +137,7 @@ public class Scoreboard {
         Score s9 = objective.getScore("§20");
         Score s10 = objective.getScore("   ");
         Score s11 = objective.getScore("§7Server§8:");
-        Score s12 = objective.getScore("§c§lTeamCastle.net");
+        Score s12 = objective.getScore("§6§lTeam§b§lCastle");
 
         s1.setScore(0);
         s2.setScore(-1);

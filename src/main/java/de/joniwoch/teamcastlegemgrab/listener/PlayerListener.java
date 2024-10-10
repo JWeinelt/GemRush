@@ -8,6 +8,7 @@ import de.joniwoch.teamcastlegemgrab.manager.player.GemgrabPlayerManager;
 import de.joniwoch.teamcastlegemgrab.manager.teams.GemgrabTeam;
 import de.joniwoch.teamcastlegemgrab.manager.teams.TeamGUI;
 import de.joniwoch.teamcastlegemgrab.manager.teams.TeamManager;
+import de.joniwoch.teamcastlegemgrab.utils.Messages;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -220,6 +221,11 @@ public class PlayerListener implements Listener {
             case "§8» §e§lTeams §8«":
                 if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
                     new TeamGUI(teamManager).open(player);
+                }
+                break;
+            case "§8» §d§lStats §8«":
+                if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+                    player.sendMessage(Messages.mainPrefix + "Die §dStats §7sind aktuell noch §cin arbeit§7.");
                 }
                 break;
         }

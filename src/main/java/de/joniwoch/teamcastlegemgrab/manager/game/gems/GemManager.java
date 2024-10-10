@@ -19,84 +19,65 @@ public class GemManager {
     private final TeamManager teamManager;
 
     public int calculateTeamGemsBlue() {
-        // Zähler für blaue Team-Gems in die Methode verlagert
-        AtomicInteger countBlue = new AtomicInteger();
-
-        // Überprüfen, ob das Team existiert
-        var blueTeam = teamManager.getTeamByColor(TeamColor.BLUE);
-        if (blueTeam == null) {
-            Bukkit.getLogger().warning("Das blaue Team existiert nicht!");
-            return 0;
-        }
-
-        // Nur fortfahren, wenn das Team nicht null ist
-        blueTeam.getPlayers().forEach(uuid -> {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                for (ItemStack item : player.getInventory().getContents()) {
-                    if (item != null) {
-                        ItemMeta meta = item.getItemMeta();
-                        if (meta != null && meta.hasDisplayName() && meta.getDisplayName().equals("§2§lGEM")) {
-                            countBlue.addAndGet(item.getAmount());
-                        }
-                    }
-                }
-            }
-        });
-        return countBlue.get();  // Korrekt die Anzahl der Gems im blauen Team zurückgeben
+        return calculateTeamGemsByColor(TeamColor.BLUE);
     }
 
     public int calculateTeamGemsRed() {
-        // Zähler für rote Team-Gems in die Methode verlagert
-        AtomicInteger countRed = new AtomicInteger();
+        return calculateTeamGemsByColor(TeamColor.RED);
+    }
 
-        // Überprüfen, ob das Team existiert
-        var redTeam = teamManager.getTeamByColor(TeamColor.RED);
-        if (redTeam == null) {
-            Bukkit.getLogger().warning("Das rote Team existiert nicht!");
+    private int calculateTeamGemsByColor(TeamColor teamColor) {
+        AtomicInteger gemCount = new AtomicInteger();
+
+        var team = teamManager.getTeamByColor(teamColor);
+        if (team == null) {
+            Bukkit.getLogger().warning("Das Team " + teamColor + " existiert nicht!");
             return 0;
         }
 
-        // Nur fortfahren, wenn das Team nicht null ist
-        redTeam.getPlayers().forEach(uuid -> {
+        team.getPlayers().forEach(uuid -> {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 for (ItemStack item : player.getInventory().getContents()) {
-                    if (item != null) {
-                        ItemMeta meta = item.getItemMeta();
-                        if (meta != null && meta.hasDisplayName() && meta.getDisplayName().equals("§2§lGEM")) {
-                            countRed.addAndGet(item.getAmount());
-                        }
+                    if (item != null && isGem(item)) {
+                        gemCount.addAndGet(item.getAmount());
                     }
                 }
             }
         });
-        return countRed.get();
+        return gemCount.get();
+    }
+
+    private boolean isGem(ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
+        return meta != null && meta.hasDisplayName() && "§2§lGEM".equals(meta.getDisplayName());
     }
 
     public void checkForCountdown() {
         int win = 10;
+
         if (TeamcastleGemgrab.getGamestate().equals(Gamestate.INGAME)) {
             if (calculateTeamGemsBlue() >= win) {
-                if (!BossbarHandler.checIsCountdownRunningRed()) {
-                    if (!BossbarHandler.checkCountdownRunningBlue()) {
-                        BossbarHandler.startBossBarCountdownBlue(15);
+                if (!BossbarHandler.isCountdownRunning(BossbarHandler.TeamColor.RED)) {
+                    if (!BossbarHandler.isCountdownRunning(BossbarHandler.TeamColor.BLUE)) {
+                        BossbarHandler.startBossBarCountdown(BossbarHandler.TeamColor.BLUE, 15);
                     }
                 }
             } else {
-                if (BossbarHandler.checkCountdownRunningBlue()) {
-                    BossbarHandler.stopBossBarCountdownBlue();
+                if (BossbarHandler.isCountdownRunning(BossbarHandler.TeamColor.BLUE)) {
+                    BossbarHandler.stopBossBarCountdown(BossbarHandler.TeamColor.BLUE);
                 }
             }
+
             if (calculateTeamGemsRed() >= win) {
-                if (!BossbarHandler.checkCountdownRunningBlue()) {
-                    if (!BossbarHandler.checIsCountdownRunningRed()) {
-                        BossbarHandler.startBossBarCountdownRed(15);
+                if (!BossbarHandler.isCountdownRunning(BossbarHandler.TeamColor.BLUE)) {
+                    if (!BossbarHandler.isCountdownRunning(BossbarHandler.TeamColor.RED)) {
+                        BossbarHandler.startBossBarCountdown(BossbarHandler.TeamColor.RED, 15);
                     }
                 }
             } else {
-                if (BossbarHandler.checIsCountdownRunningRed()) {
-                    BossbarHandler.stopBossBarCountdownRed();
+                if (BossbarHandler.isCountdownRunning(BossbarHandler.TeamColor.RED)) {
+                    BossbarHandler.stopBossBarCountdown(BossbarHandler.TeamColor.RED);
                 }
             }
         }

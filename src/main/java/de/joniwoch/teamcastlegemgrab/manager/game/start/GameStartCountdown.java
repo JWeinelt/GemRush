@@ -40,6 +40,7 @@ public class GameStartCountdown {
                     Bukkit.getScheduler().cancelTask(taskIdHolder[0]);
                     TeamcastleGemgrab.setGamestate(Gamestate.INGAME);
                     GemSpawnerManager.spawnGems(TeamcastleGemgrab.getGameMap().getSpawner());
+
                     BossbarHandler.setDefaultBossbar();
                 }
             }

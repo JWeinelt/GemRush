@@ -11,6 +11,7 @@ import de.joniwoch.teamcastlegemgrab.listener.WorldListener;
 import de.joniwoch.teamcastlegemgrab.manager.game.GameSettings;
 import de.joniwoch.teamcastlegemgrab.manager.game.gameplay.BossbarHandler;
 import de.joniwoch.teamcastlegemgrab.manager.game.gameplay.PlayerDeathHandler;
+import de.joniwoch.teamcastlegemgrab.manager.game.gameplay.WinManager;
 import de.joniwoch.teamcastlegemgrab.manager.game.gems.GemManager;
 import de.joniwoch.teamcastlegemgrab.manager.game.start.GameStartHandler;
 import de.joniwoch.teamcastlegemgrab.manager.game.Gamestate;
@@ -54,6 +55,7 @@ public final class TeamcastleGemgrab extends JavaPlugin {
     private GameStartHandler gameStartHandler;
     private PlayerDeathHandler playerDeathHandler;
     private GemManager gemManager;
+    private WinManager winManager;
 
 
     @Override
@@ -65,6 +67,7 @@ public final class TeamcastleGemgrab extends JavaPlugin {
         this.lobbyItemManager = new LobbyItemManager();
         this.teamManager = new TeamManager();
         this.lobbyLocationManager = new LobbyLocationManager();
+        this.winManager = new WinManager(lobbyLocationManager);
         this.gameMapManager = new GameMapManager(teamManager);
         this.gameMapManager.cacheGameMap();
         this.gameItemManager = new GameItemManager(teamManager);
@@ -72,7 +75,6 @@ public final class TeamcastleGemgrab extends JavaPlugin {
         this.scoreboard = new Scoreboard(teamManager, gameMapManager);
         this.playerDeathHandler = new PlayerDeathHandler(gameMapManager, gameItemManager);
         this.gemManager = new GemManager(teamManager);
-
 
         registerListener();
         registerCommands();
@@ -84,7 +86,7 @@ public final class TeamcastleGemgrab extends JavaPlugin {
         this.teamManager.registerTeams();
         this.lobbyLocationManager.cacheLobbyLocation();
         GameSettings.setTeamSize(3);
-        GameSettings.setGemCooldown(7);
+        GameSettings.setGemCooldown(2);
         GameSettings.setStartCountdown(10);
         GameSettings.setRespawnTimer(5);
         updateScoreboard();
@@ -103,7 +105,6 @@ public final class TeamcastleGemgrab extends JavaPlugin {
                         this.scoreboard.update(player);
                     });
                     Bukkit.getScheduler().runTaskTimer(TeamcastleGemgrab.getInstance(), () -> {
-                        BossbarHandler.defaultBossBar.setTitle("§8| §a§l" + this.gemManager.calculateTeamGemsBlue() + " §7- §1Blau §7----------- §4Rot §7- §a§l" + this.gemManager.calculateTeamGemsRed() + " §8|");
                         this.gemManager.checkForCountdown();
                     }, 0, 2);
                 }

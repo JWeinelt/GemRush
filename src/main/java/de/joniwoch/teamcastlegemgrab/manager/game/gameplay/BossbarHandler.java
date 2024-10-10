@@ -2,6 +2,8 @@ package de.joniwoch.teamcastlegemgrab.manager.game.gameplay;
 
 import de.joniwoch.teamcastlegemgrab.TeamcastleGemgrab;
 import de.joniwoch.teamcastlegemgrab.manager.game.Gamestate;
+import de.joniwoch.teamcastlegemgrab.manager.game.gems.GemManager;
+import de.joniwoch.teamcastlegemgrab.manager.teams.TeamManager;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -13,139 +15,129 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.EnumMap;
+import java.util.Map;
 
 @UtilityClass
 public class BossbarHandler {
 
-    public BossBar defaultBossBar;
-    public BossBar blueWinBossBar;
-    public BossBar redWinBossBar;
-    private BukkitTask countdownTaskBlue;
-    private BukkitTask countdownTaskRed;
-    private boolean isCountdownRunningBlue = false;
-    private boolean isCountdownRunningRed = false;
+    private BossBar defaultBossBar;
+    private Map<TeamColor, BossBar> teamBossBars = new EnumMap<>(TeamColor.class);
+    private Map<TeamColor, BukkitTask> countdownTasks = new EnumMap<>(TeamColor.class);
+    private Map<TeamColor, Boolean> isCountdownRunning = new EnumMap<>(TeamColor.class);
+
+    public enum TeamColor {
+        BLUE("§1Blau", BarColor.BLUE, Sound.BLOCK_NOTE_BLOCK_GUITAR),
+        RED("§4Rot", BarColor.RED, Sound.BLOCK_NOTE_BLOCK_GUITAR);
+
+        private final String name;
+        private final BarColor barColor;
+        private final Sound countdownSound;
+
+        TeamColor(String name, BarColor barColor, Sound countdownSound) {
+            this.name = name;
+            this.barColor = barColor;
+            this.countdownSound = countdownSound;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public BarColor getBarColor() {
+            return barColor;
+        }
+
+        public Sound getCountdownSound() {
+            return countdownSound;
+        }
+    }
+
+    GemManager gemManager = TeamcastleGemgrab.getInstance().getGemManager();
 
     public void setDefaultBossbar() {
-        defaultBossBar = Bukkit.createBossBar("§8| §a§l0 §7- §1Blau §7----------- §4Rot §7- §a§l0 §8|", BarColor.WHITE, BarStyle.SOLID);
+        defaultBossBar = Bukkit.createBossBar(
+                "§8| §a§l0 §7- §1Blau §7----------- §4Rot §7- §a§l0 §8|",
+                BarColor.WHITE,
+                BarStyle.SOLID
+        );
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            defaultBossBar.addPlayer(player);
-        }
-    }
+        addAllPlayersToBossBar(defaultBossBar);
 
-    public void startBossBarCountdownBlue(int seconds) {
-        stopBossBarCountdownBlue();
-        blueWinBossBar = Bukkit.createBossBar("§7Team §1§lBlau §7hat genügend §2§lGems!", BarColor.BLUE, BarStyle.SOLID);
-        blueWinBossBar.setProgress(1.0);
-        blueWinBossBar.setColor(BarColor.BLUE);
-        blueWinBossBar.addFlag(BarFlag.DARKEN_SKY);
-        defaultBossBar.removeAll();
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            blueWinBossBar.addPlayer(player);
-        }
-        final int totalTicks = seconds * 20;
-        isCountdownRunningBlue = true;
-        countdownTaskBlue = new BukkitRunnable() {
-            int ticksElapsed = 0;
+        new BukkitRunnable() {
             @Override
             public void run() {
-                switch (ticksElapsed) {
-                    case 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290 -> {
-                        Bukkit.getOnlinePlayers().forEach(player -> {
-                            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_GUITAR,3, 3);
-                        });
-                    }
-                }
-                double progress = 1.0 - ((double) ticksElapsed / totalTicks);
-                blueWinBossBar.setProgress(progress);
-                ticksElapsed++;
-                if (ticksElapsed >= totalTicks) {
-                    blueWinBossBar.setProgress(0.0);
-                    this.cancel();
-                    isCountdownRunningBlue = false;
-                    TeamcastleGemgrab.setGamestate(Gamestate.ENDED);
-                    blueWinBossBar.setTitle("§7Team §1§lBlau §7hat §agewonnen!");
-                    Bukkit.getOnlinePlayers().forEach(player -> {
-                        player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 3, 3);
-                        player.sendTitle("§7Team §1§lBlau", "§7hat §agewonnen§7!");
-                    });
-                }
+                String title = "§8| §a§l" + gemManager.calculateTeamGemsBlue()
+                        + " §7- §1Blau §7----------- §4Rot §7- §a§l"
+                        + gemManager.calculateTeamGemsRed() + " §8|";
+
+                defaultBossBar.setTitle(title);
             }
-        }.runTaskTimer(TeamcastleGemgrab.getInstance(), 0L, 1L);
+        }.runTaskTimer(TeamcastleGemgrab.getInstance(), 0L, 2L);
     }
 
-    public void stopBossBarCountdownBlue() {
-        if (countdownTaskBlue != null && !countdownTaskBlue.isCancelled()) {
-            countdownTaskBlue.cancel();
-            countdownTaskBlue = null;
-            isCountdownRunningBlue = false;
-            blueWinBossBar.removeAll();
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                defaultBossBar.addPlayer(player);
-            }
-        }
-    }
-
-    public void startBossBarCountdownRed(int seconds) {
-        stopBossBarCountdownRed();
-        redWinBossBar = Bukkit.createBossBar("§7Team §4§lRot §7hat genügend §2§lGems!", BarColor.BLUE, BarStyle.SOLID);
-        redWinBossBar.setProgress(1.0);
-        redWinBossBar.setColor(BarColor.RED);
-        redWinBossBar.addFlag(BarFlag.DARKEN_SKY);
-        defaultBossBar.removeAll();
+    private void addAllPlayersToBossBar(BossBar bossBar) {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            redWinBossBar.addPlayer(player);
+            bossBar.addPlayer(player);
         }
+    }
+
+    public void startBossBarCountdown(TeamColor teamColor, int seconds) {
+        stopBossBarCountdown(teamColor);
+
+        BossBar bossBar = Bukkit.createBossBar(
+                "§7Team " + teamColor.getName() + " §7hat genügend §2§lGems!",
+                teamColor.getBarColor(), BarStyle.SOLID, BarFlag.DARKEN_SKY);
+        bossBar.setProgress(1.0);
+
+        teamBossBars.put(teamColor, bossBar);
+        defaultBossBar.removeAll();
+        addAllPlayersToBossBar(bossBar);
+
+        isCountdownRunning.put(teamColor, true);
         final int totalTicks = seconds * 20;
-        isCountdownRunningRed = true;
-        countdownTaskRed = new BukkitRunnable() {
+
+        countdownTasks.put(teamColor, new BukkitRunnable() {
             int ticksElapsed = 0;
+
             @Override
             public void run() {
-                switch (ticksElapsed) {
-                    case 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290 -> {
-                        Bukkit.getOnlinePlayers().forEach(player -> {
-                            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_GUITAR,3, 3);
-                        });
-                    }
+                if (ticksElapsed % 20 == 0) {
+                    Bukkit.getOnlinePlayers().forEach(player ->
+                            player.playSound(player.getLocation(), teamColor.getCountdownSound(), 3, 3)
+                    );
                 }
+
                 double progress = 1.0 - ((double) ticksElapsed / totalTicks);
-                redWinBossBar.setProgress(progress);
+                bossBar.setProgress(progress);
                 ticksElapsed++;
+
                 if (ticksElapsed >= totalTicks) {
-                    redWinBossBar.setProgress(0.0);
-                    this.cancel();
-                    isCountdownRunningRed = false;
-                    TeamcastleGemgrab.setGamestate(Gamestate.ENDED);
-                    redWinBossBar.setTitle("§7Team §4§lRot §7hat §agewonnen!");
-                    Bukkit.getOnlinePlayers().forEach(player -> {
-                        player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 3, 3);
-                        player.sendTitle("§7Team §4§lRot", "§7hat §agewonnen§7!");
-                    });
+                    endBossBarCountdown(teamColor, bossBar);
                 }
             }
-        }.runTaskTimer(TeamcastleGemgrab.getInstance(), 0L, 1L);
+        }.runTaskTimer(TeamcastleGemgrab.getInstance(), 0L, 1L));
     }
 
-    public void stopBossBarCountdownRed() {
-        if (countdownTaskRed != null && !countdownTaskRed.isCancelled()) {
-            countdownTaskRed.cancel();
-            countdownTaskRed = null;
-            isCountdownRunningRed = false;
-            redWinBossBar.removeAll();
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                defaultBossBar.addPlayer(player);
-            }
+    private void endBossBarCountdown(TeamColor teamColor, BossBar bossBar) {
+        bossBar.setProgress(0.0);
+        countdownTasks.get(teamColor).cancel();
+        isCountdownRunning.put(teamColor, false);
+        bossBar.setTitle("§7Team " + teamColor.getName() + " §7hat §agewonnen!");
+        TeamcastleGemgrab.getInstance().getWinManager().executeWinSequenze(teamColor, bossBar);
+    }
+
+    public void stopBossBarCountdown(TeamColor teamColor) {
+        BukkitTask task = countdownTasks.get(teamColor);
+        if (task != null && !task.isCancelled()) {
+            task.cancel();
+            isCountdownRunning.put(teamColor, false);
+            teamBossBars.get(teamColor).removeAll();
+            addAllPlayersToBossBar(defaultBossBar);
         }
     }
 
-    public boolean checkCountdownRunningBlue() {
-        return isCountdownRunningBlue;
-    }
-
-    public boolean checIsCountdownRunningRed() {
-        return isCountdownRunningRed;
+    public boolean isCountdownRunning(TeamColor teamColor) {
+        return isCountdownRunning.getOrDefault(teamColor, false);
     }
 }
