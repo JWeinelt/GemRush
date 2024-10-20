@@ -27,6 +27,7 @@ public class GameStartHandler {
     private final TeamManager teamManager;
 
     public void startGame() {
+        TeamcastleGemgrab.setGamestate(Gamestate.STARTING);
         teamManager.autofillTeams();
         Bukkit.getOnlinePlayers().forEach(player -> {
             player.setHealth(20);
@@ -44,7 +45,6 @@ public class GameStartHandler {
             });
             GemSpawnerManager.createGemSpawner(gameMapManager.gameMap.getSpawner());
         }, 5);
-        TeamcastleGemgrab.setGamestate(Gamestate.STARTING);
         GameStartCountdown.startStarterCountdown();
     }
 }

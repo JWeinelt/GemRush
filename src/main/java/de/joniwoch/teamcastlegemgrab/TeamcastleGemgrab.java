@@ -86,7 +86,7 @@ public final class TeamcastleGemgrab extends JavaPlugin {
         this.teamManager.registerTeams();
         this.lobbyLocationManager.cacheLobbyLocation();
         GameSettings.setTeamSize(3);
-        GameSettings.setGemCooldown(2);
+        GameSettings.setGemCooldown(10);
         GameSettings.setStartCountdown(10);
         GameSettings.setRespawnTimer(5);
         updateScoreboard();

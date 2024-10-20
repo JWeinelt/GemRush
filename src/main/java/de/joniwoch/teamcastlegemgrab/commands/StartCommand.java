@@ -1,5 +1,7 @@
 package de.joniwoch.teamcastlegemgrab.commands;
 
+import de.joniwoch.teamcastlegemgrab.TeamcastleGemgrab;
+import de.joniwoch.teamcastlegemgrab.manager.game.Gamestate;
 import de.joniwoch.teamcastlegemgrab.manager.game.start.GameStartHandler;
 import de.joniwoch.teamcastlegemgrab.utils.Messages;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,11 @@ public class StartCommand implements CommandExecutor {
             player.sendMessage(" ");
             player.sendMessage(Messages.ussagePrefix + "start");
             player.sendMessage(" ");
+            return false;
+        }
+
+        if (!TeamcastleGemgrab.getGamestate().equals(Gamestate.LOBBY)) {
+            player.sendMessage(Messages.errorPrefix + "Das Spiel §cwurde bereits §7gestartet.");
             return false;
         }
 
