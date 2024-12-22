@@ -55,7 +55,6 @@ public class GemManager {
 
     public void checkForCountdown() {
         int win = 10;
-
         if (TeamcastleGemgrab.getGamestate().equals(Gamestate.INGAME)) {
             if (calculateTeamGemsBlue() >= win) {
                 if (!BossbarHandler.isCountdownRunning(BossbarHandler.TeamColor.RED)) {
