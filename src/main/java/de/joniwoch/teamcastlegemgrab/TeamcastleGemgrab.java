@@ -10,6 +10,7 @@ import de.joniwoch.teamcastlegemgrab.listener.QuitListener;
 import de.joniwoch.teamcastlegemgrab.listener.WorldListener;
 import de.joniwoch.teamcastlegemgrab.manager.game.GameSettings;
 import de.joniwoch.teamcastlegemgrab.manager.game.gameplay.BossbarHandler;
+import de.joniwoch.teamcastlegemgrab.manager.game.gameplay.HeightManager;
 import de.joniwoch.teamcastlegemgrab.manager.game.gameplay.PlayerDeathHandler;
 import de.joniwoch.teamcastlegemgrab.manager.game.gameplay.WinManager;
 import de.joniwoch.teamcastlegemgrab.manager.game.gems.GemManager;
@@ -27,6 +28,7 @@ import de.joniwoch.teamcastlegemgrab.utils.Config;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.PluginManager;
@@ -56,6 +58,7 @@ public final class TeamcastleGemgrab extends JavaPlugin {
     private PlayerDeathHandler playerDeathHandler;
     private GemManager gemManager;
     private WinManager winManager;
+    private HeightManager heightManager;
 
 
     @Override
@@ -75,6 +78,7 @@ public final class TeamcastleGemgrab extends JavaPlugin {
         this.scoreboard = new Scoreboard(teamManager, gameMapManager);
         this.playerDeathHandler = new PlayerDeathHandler(gameMapManager, gameItemManager);
         this.gemManager = new GemManager(teamManager);
+        this.heightManager = new HeightManager(playerDeathHandler);
 
         registerListener();
         registerCommands();
@@ -106,6 +110,7 @@ public final class TeamcastleGemgrab extends JavaPlugin {
                     });
                     Bukkit.getScheduler().runTaskTimer(TeamcastleGemgrab.getInstance(), () -> {
                         this.gemManager.checkForCountdown();
+                        this.heightManager.checkHeight();
                     }, 0, 2);
                 }
             }
@@ -134,6 +139,7 @@ public final class TeamcastleGemgrab extends JavaPlugin {
         world.getEntities().forEach(Entity::remove);
         world.setGameRuleValue("doDaylightCycle", "false");
         world.setTime(6000);
+        world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
     }
 
     @Override
