@@ -83,7 +83,9 @@ public class PlayerDeathHandler {
                 }
             }
         }
-        Bukkit.getWorld("world").dropItemNaturally(player.getLocation(), new ItemAPI("§2§lGEM", Material.EMERALD, count).build());
+        if (count != 0) {
+            Bukkit.getWorld("world").dropItemNaturally(player.getLocation(), new ItemAPI("§2§lGEM", Material.EMERALD, count).build());
+        }
     }
 
     public void startRespawnCountdown(Player player) {
