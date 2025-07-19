@@ -40,7 +40,7 @@ public class WorldListener implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         if (TeamcastleGemgrab.getGamestate() == Gamestate.INGAME) {
-            if (event.getPlayer().getLocation().getY() <= 50) {
+            if (event.getPlayer().getLocation().getY() <= 88) {
                 deathHandler.setPlayerDead(event.getPlayer());
             }
         }

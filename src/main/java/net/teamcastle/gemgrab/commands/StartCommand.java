@@ -5,6 +5,7 @@ import net.teamcastle.gemgrab.manager.game.Gamestate;
 import net.teamcastle.gemgrab.manager.game.start.GameStartHandler;
 import net.teamcastle.gemgrab.utils.Messages;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -26,6 +27,11 @@ public class StartCommand implements CommandExecutor {
 
         if (!player.hasPermission("gemgrab.start")) {
             player.sendMessage(Messages.noPermsPrefix);
+            return false;
+        }
+
+        if (!(Bukkit.getOnlinePlayers().size() >= 2)) {
+            player.sendMessage(Messages.mainPrefix + "§cEs sind nicht genügend Spieler in der Runde.");
             return false;
         }
 

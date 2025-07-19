@@ -19,7 +19,7 @@ public class Scoreboard {
         org.bukkit.scoreboard.Scoreboard scoreboard = manager.getNewScoreboard();
         int onlinePlayers = Bukkit.getOnlinePlayers().size();
 
-        Objective objective = scoreboard.registerNewObjective("test", "dummy", "  §6GemGrab  ");
+        Objective objective = scoreboard.registerNewObjective("test", "dummy", "  §aGemGrab  ");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         Team gameMap = scoreboard.registerNewTeam("gamemap");

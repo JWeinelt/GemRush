@@ -228,6 +228,11 @@ public class PlayerListener implements Listener {
                     player.sendMessage(Messages.mainPrefix + "Die §6Stats §7sind aktuell noch §cin Arbeit§7.");
                 }
                 break;
+            case "§7» §cZurück zur Lobby §7«":
+                if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || event.getAction().equals(Action.RIGHT_CLICK_AIR)) {
+                    player.sendMessage(Messages.mainPrefix + "§c");
+                }
+                break;
         }
     }
 
@@ -251,4 +256,5 @@ public class PlayerListener implements Listener {
             }
         }
     }
+
 }

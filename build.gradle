@@ -24,7 +24,7 @@ java {
 }
 
 dependencies {
-    compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
+    compileOnly 'io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT'
     compileOnly 'org.jetbrains:annotations:24.1.0'
     implementation 'org.checkerframework:checker-qual:3.28.0'
     implementation("net.dv8tion:JDA:5.0.0-beta.20")
@@ -33,4 +33,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
     testCompileOnly 'org.projectlombok:lombok:1.18.30'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
-}
+    implementation platform('eu.cloudnetservice.cloudnet:bom:4.0.0-RC13')
+    compileOnly 'eu.cloudnetservice.cloudnet:driver-api'
+    compileOnly 'eu.cloudnetservice.cloudnet:bridge-api'
+    compileOnly 'eu.cloudnetservice.cloudnet:wrapper-jvm-api'}

@@ -1,5 +1,9 @@
 package net.teamcastle.gemgrab.manager.game.start;
 
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
+import eu.cloudnetservice.modules.bridge.BridgeServiceHelper;
+import eu.cloudnetservice.wrapper.holder.ServiceInfoHolder;
 import net.teamcastle.gemgrab.TeamcastleGemgrab;
 import net.teamcastle.gemgrab.manager.game.Gamestate;
 import net.teamcastle.gemgrab.manager.game.gems.GemSpawnerManager;
@@ -40,5 +44,10 @@ public class GameStartHandler {
             GemSpawnerManager.createGemSpawner(gameMapManager.gameMap.getSpawner());
         }, 5);
         GameStartCountdown.startStarterCountdown();
+        InjectionLayer.ext().instance(BridgeServiceHelper.class).changeToIngame(false);
+        ServiceInfoHolder serviceInfoHolder = InjectionLayer.ext().instance(ServiceInfoHolder.class);
+        serviceInfoHolder.publishServiceInfoUpdate();
     }
+
+
 }

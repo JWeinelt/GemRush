@@ -1,6 +1,11 @@
 package net.teamcastle.gemgrab.manager.game.start;
 
 
+import eu.cloudnetservice.driver.event.events.service.CloudServiceEvent;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
+import eu.cloudnetservice.modules.bridge.BridgeServiceHelper;
+import eu.cloudnetservice.wrapper.holder.ServiceInfoHolder;
 import net.teamcastle.gemgrab.TeamcastleGemgrab;
 import net.teamcastle.gemgrab.manager.game.Gamestate;
 import net.teamcastle.gemgrab.manager.game.gameplay.BossbarHandler;
@@ -31,14 +36,13 @@ public class GameStartCountdown {
             switch (secondsLeft) {
                 case 0 -> {
                     Bukkit.getOnlinePlayers().forEach(player -> {
-                        player.sendTitle("§4§lGem§c§lGrab", "§aViel Glück");
+                        player.sendTitle("§a§lGemGrab", "§aViel Glück");
                         player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 3, 10);
                     });
                     Bukkit.getScheduler().cancelTask(taskIdHolder[0]);
-                    TeamcastleGemgrab.setGamestate(Gamestate.INGAME);
                     GemSpawnerManager.spawnGems(TeamcastleGemgrab.getGameMap().getSpawner());
-
                     BossbarHandler.setDefaultBossbar();
+                    TeamcastleGemgrab.setGamestate(Gamestate.INGAME);
                 }
             }
         }, 0L, 20L).getTaskId();
