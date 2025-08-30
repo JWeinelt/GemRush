@@ -6,7 +6,7 @@ import lombok.experimental.UtilityClass;
 public class Messages {
 
 
-    public String mainPrefix = "§7[§aGemGrab§7] ";
+    public String mainPrefix = "§8» §2Gem§aRush §8•";
     public String noPermsPrefix = "§cDazu hast du keine Rechte!";
     public String errorPrefix = "§4§lFEHLER: §7";
     public String ussagePrefix = errorPrefix + "Bitte verwende §e";

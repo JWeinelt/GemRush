@@ -13,6 +13,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.sql.SQLException;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @RequiredArgsConstructor
@@ -31,6 +34,16 @@ public class PlayerDeathHandler {
         dead.getInventory().setArmorContents(null);
         startRespawnCountdown(dead);
         dead.setFoodLevel(20);
+        try {
+            TeamcastleGemgrab.getInstance().getMySQLManager().addDeath(dead.getUniqueId());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            TeamcastleGemgrab.getInstance().getMySQLManager().addKill(gemgrabPlayerDead.getLastDamager().getUuid());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         gemgrabPlayerDead.setLastDamager(null);
         GemgrabPlayer gemgrabPlayer = GemgrabPlayerManager.getGemgrabPlayerByUUID(dead.getUniqueId());
         gemgrabPlayer.setDead(true);
@@ -55,6 +68,12 @@ public class PlayerDeathHandler {
         dead.setAllowFlight(true);
         dropPlayerGems(dead);
         dead.getInventory().clear();
+        dead.setFoodLevel(20);
+        try {
+            TeamcastleGemgrab.getInstance().getMySQLManager().addDeath(dead.getUniqueId());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         dead.getInventory().setArmorContents(null);
         startRespawnCountdown(dead);
         dead.setFoodLevel(20);

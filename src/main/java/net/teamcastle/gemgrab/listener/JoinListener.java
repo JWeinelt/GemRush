@@ -1,6 +1,7 @@
 package net.teamcastle.gemgrab.listener;
 
 import net.teamcastle.gemgrab.TeamcastleGemgrab;
+import net.teamcastle.gemgrab.manager.database.MySQLManager;
 import net.teamcastle.gemgrab.manager.items.lobbyitems.LobbyItemManager;
 import net.teamcastle.gemgrab.manager.locations.LobbyLocationManager;
 import net.teamcastle.gemgrab.manager.player.GemgrabPlayerManager;
@@ -14,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import java.sql.SQLException;
 import java.util.Calendar;
 
 @RequiredArgsConstructor
@@ -44,8 +46,13 @@ public class JoinListener implements Listener {
         player.setFoodLevel(20);
         player.setLevel(Calendar.getInstance().get(Calendar.YEAR));
         player.setExp((float) Calendar.getInstance().get(Calendar.DAY_OF_YEAR) / 365);
-        player.sendTitle("§6GemGrab", "§aViel Erfolg.");
+        player.sendTitle("§a§lGemGrab", "§aViel Erfolg!");
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 3);
         scoreboard.setScoreboard(player);
+        try {
+            TeamcastleGemgrab.getInstance().getMySQLManager().createPlayer(player.getUniqueId());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

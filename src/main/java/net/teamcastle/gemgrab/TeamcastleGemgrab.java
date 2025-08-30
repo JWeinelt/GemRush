@@ -1,13 +1,11 @@
 package net.teamcastle.gemgrab;
 
-import net.teamcastle.gemgrab.commands.CreateMapCommand;
-import net.teamcastle.gemgrab.commands.SetGameSpawnCommand;
-import net.teamcastle.gemgrab.commands.SetLobbySpawnCommand;
-import net.teamcastle.gemgrab.commands.StartCommand;
+import net.teamcastle.gemgrab.commands.*;
 import net.teamcastle.gemgrab.listener.JoinListener;
 import net.teamcastle.gemgrab.listener.PlayerListener;
 import net.teamcastle.gemgrab.listener.QuitListener;
 import net.teamcastle.gemgrab.listener.WorldListener;
+import net.teamcastle.gemgrab.manager.database.MySQLManager;
 import net.teamcastle.gemgrab.manager.game.GameSettings;
 import net.teamcastle.gemgrab.manager.game.gameplay.HeightManager;
 import net.teamcastle.gemgrab.manager.game.gameplay.PlayerDeathHandler;
@@ -46,6 +44,9 @@ public final class TeamcastleGemgrab extends JavaPlugin {
     @Setter
     private static GameMap gameMap;
 
+    @Getter
+    private MySQLManager mySQLManager;
+
     private LobbyItemManager lobbyItemManager;
     private TeamManager teamManager;
     private LobbyLocationManager lobbyLocationManager;
@@ -66,10 +67,18 @@ public final class TeamcastleGemgrab extends JavaPlugin {
         gamestate = Gamestate.LOBBY;
         Config.load(this);
 
+        mySQLManager = new MySQLManager("localhost", 3306, "gemgrab", "root", "pi19NbPF3ynrncJq");
+        try {
+            mySQLManager.connect();
+        } catch (Exception e) {
+            e.printStackTrace();
+            getServer().getPluginManager().disablePlugin(this);
+        }
+
         this.lobbyItemManager = new LobbyItemManager();
         this.teamManager = new TeamManager();
         this.lobbyLocationManager = new LobbyLocationManager();
-        this.winManager = new WinManager(lobbyLocationManager);
+        this.winManager = new WinManager(lobbyLocationManager, teamManager);
         this.gameMapManager = new GameMapManager(teamManager);
         this.gameMapManager.cacheGameMap();
         this.gameItemManager = new GameItemManager(teamManager);
@@ -128,6 +137,7 @@ public final class TeamcastleGemgrab extends JavaPlugin {
         getCommand("createmap").setExecutor(new CreateMapCommand(gameMapManager));
         getCommand("setgamespawn").setExecutor(new SetGameSpawnCommand(gameMapManager));
         getCommand("start").setExecutor(new StartCommand(gameStartHandler));
+        getCommand("stats").setExecutor(new StatsCommand(this));
     }
 
     public void setWorldSettings() {
@@ -142,6 +152,11 @@ public final class TeamcastleGemgrab extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        try {
+            mySQLManager.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         getLogger().info("GemGrab Plugin successful disabled.");
     }
 }

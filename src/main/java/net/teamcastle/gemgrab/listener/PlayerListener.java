@@ -225,12 +225,12 @@ public class PlayerListener implements Listener {
                 break;
             case "§7» §6Stats §7«":
                 if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-                    player.sendMessage(Messages.mainPrefix + "Die §6Stats §7sind aktuell noch §cin Arbeit§7.");
+                    player.performCommand("stats");
                 }
                 break;
             case "§7» §cZurück zur Lobby §7«":
                 if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || event.getAction().equals(Action.RIGHT_CLICK_AIR)) {
-                    player.sendMessage(Messages.mainPrefix + "§c");
+                    player.sendMessage(Messages.mainPrefix + "§cDas Item ist derzeit in Arbeit!");
                 }
                 break;
         }
@@ -238,6 +238,11 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onDropItem(PlayerDropItemEvent event) {
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onFood(FoodLevelChangeEvent event) {
         event.setCancelled(true);
     }
 

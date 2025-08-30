@@ -1,6 +1,7 @@
 package net.teamcastle.gemgrab.manager.teams;
 
 import net.teamcastle.gemgrab.manager.game.GameSettings;
+import net.teamcastle.gemgrab.manager.game.gameplay.BossbarHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -92,6 +93,25 @@ public class TeamManager {
         }
         getTeamByColor(team).getPlayers().add(player);
     }
+
+    public List<Player> getPlayersByTeamColor(BossbarHandler.TeamColor color) {
+        GemgrabTeam team = switch (color) {
+            case RED -> getTeamByColor(TeamColor.RED);
+            case BLUE -> getTeamByColor(TeamColor.BLUE);
+        };
+
+        if (team == null) return List.of();
+
+        List<Player> players = new ArrayList<>();
+        for (UUID uuid : team.getPlayers()) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null && player.isOnline()) {
+                players.add(player);
+            }
+        }
+        return players;
+    }
+
 
     public void leaveTeam(UUID player) {
         if (isInTeam(player)) {
