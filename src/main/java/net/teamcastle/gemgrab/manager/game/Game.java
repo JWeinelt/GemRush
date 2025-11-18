@@ -4,7 +4,6 @@ import de.codeblocksmc.codelib.locations.LocUtil;
 import lombok.Getter;
 import lombok.Setter;
 import net.teamcastle.gemgrab.GemRush;
-import net.teamcastle.gemgrab.listener.PlayerListener;
 import net.teamcastle.gemgrab.manager.game.gems.GemManager;
 import net.teamcastle.gemgrab.manager.game.gems.GemSpawnerManager;
 import net.teamcastle.gemgrab.manager.map.GameMap;

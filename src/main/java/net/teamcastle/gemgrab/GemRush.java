@@ -76,15 +76,8 @@ public final class GemRush extends JavaPlugin {
 
         this.gameMapManager = new GameMapManager();
         this.gameItemManager = new GameItemManager();
-
-        registerListeners();
         registerCommands();
         setWorldSettings();
-    }
-
-    public void registerListeners() {
-        PluginManager manager = Bukkit.getPluginManager();
-        manager.registerEvents(new JoinListener(), this);
     }
 
     public void registerCommands() {

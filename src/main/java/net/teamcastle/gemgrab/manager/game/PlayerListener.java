@@ -1,11 +1,9 @@
-package net.teamcastle.gemgrab.listener;
+package net.teamcastle.gemgrab.manager.game;
 
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.teamcastle.gemgrab.GemRush;
-import net.teamcastle.gemgrab.manager.game.Game;
-import net.teamcastle.gemgrab.manager.game.GameState;
 import net.teamcastle.gemgrab.manager.player.GPlayer;
 import net.teamcastle.gemgrab.manager.player.PlayerManager;
 import net.teamcastle.gemgrab.manager.teams.TeamColor;
