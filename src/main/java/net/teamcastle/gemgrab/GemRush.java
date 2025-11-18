@@ -147,6 +147,12 @@ public final class GemRush extends JavaPlugin {
             log.info("Disconnecting from MySQL database...");
             mySQLManager.disconnect();
         }
+        log.info("Disabling temporary worlds...");
+        log.info("Deleting lobbies...");
+        lobbyManager.cleanupAll();
+        worldManager.cleanup();
+        log.info("Done.");
+        localStorage.saveConfigNonReplace();
         log.info("Disabled GemRush.");
         log.info("Goodbye!");
     }
