@@ -1,18 +1,19 @@
 package net.teamcastle.gemgrab.manager.items.lobbyitems;
 
-import net.teamcastle.gemgrab.manager.items.ItemAPI;
+import de.codeblocksmc.codelib.wrapping.ItemBuilder;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.UtilityClass;
 import org.bukkit.Material;
+import org.bukkit.Utility;
 import org.bukkit.entity.Player;
 
-@RequiredArgsConstructor
+@UtilityClass
 public class LobbyItemManager {
 
-    public void setLobbyItems(Player player) {
+    public static void setLobbyItems(Player player) {
         player.getInventory().clear();
-        player.getInventory().setArmorContents(null);
-        player.getInventory().setItem(1, new ItemAPI("§7» §6Teams §7«", Material.ORANGE_BED, 1).build());
-        player.getInventory().setItem(4, new ItemAPI("§7» §6Stats §7«", Material.PAPER, 1).build());
-        player.getInventory().setItem(7, new ItemAPI("§7» §cZurück zur Lobby §7«", Material.RED_DYE, 1).build());
+        player.getInventory().setItem(1, new ItemBuilder(Material.ORANGE_BED).displayname("§7» §6Teams §7«").build());
+        player.getInventory().setItem(4, new ItemBuilder(Material.PAPER).displayname("§7» §6Stats §7«").build());
+        player.getInventory().setItem(7, new ItemBuilder(Material.RED_DYE).displayname("§7» §cBack to Lobby §7«").build());
     }
 }
