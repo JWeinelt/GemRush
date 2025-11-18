@@ -1,70 +1,43 @@
 package net.teamcastle.gemgrab.manager.items.gameitems;
 
-import net.teamcastle.gemgrab.manager.items.ItemAPI;
-import net.teamcastle.gemgrab.manager.teams.GemgrabTeam;
-import net.teamcastle.gemgrab.manager.teams.TeamManager;
-import lombok.RequiredArgsConstructor;
+import de.codeblocksmc.codelib.wrapping.ItemBuilder;
+import net.teamcastle.gemgrab.GemRush;
+import net.teamcastle.gemgrab.manager.GameManager;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionType;
 
-@RequiredArgsConstructor
 public class GameItemManager {
-
-    private final TeamManager teamManager;
+    public static GameItemManager getInstance() {
+        return GemRush.getInstance().getGameItemManager();
+    }
 
     public ItemStack createBlueChestplate() {
-        ItemStack blueChestplate = new ItemStack(Material.LEATHER_CHESTPLATE);
-        LeatherArmorMeta meta = (LeatherArmorMeta) blueChestplate.getItemMeta();
-        if (meta != null) {
-            meta.setColor(Color.BLUE);
-            meta.setDisplayName("§6Brustplatte");
-            meta.setUnbreakable(true);
-            meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-            blueChestplate.setItemMeta(meta);
-        }
-        return blueChestplate;
+        return new ItemBuilder(Material.LEATHER_CHESTPLATE).leatherColor(Color.BLUE).displayname("§6Chestplate")
+                .unbreakable(true).flags(ItemFlag.HIDE_UNBREAKABLE).build();
     }
 
     public ItemStack createRedChestplate() {
-        ItemStack redChestplate = new ItemStack(Material.LEATHER_CHESTPLATE);
-        LeatherArmorMeta meta = (LeatherArmorMeta) redChestplate.getItemMeta();
-        if (meta != null) {
-            meta.setColor(Color.RED);
-            meta.setDisplayName("§6Brustplatte");
-            meta.setUnbreakable(true);
-            meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-            redChestplate.setItemMeta(meta);
-        }
-        return redChestplate;
+        return new ItemBuilder(Material.LEATHER_CHESTPLATE).leatherColor(Color.RED).displayname("§6Chestplate")
+                .unbreakable(true).flags(ItemFlag.HIDE_UNBREAKABLE).build();
     }
 
     public void setGameItems(Player player) {
         player.getInventory().clear();
-        player.getInventory().setArmorContents(null);
 
-        player.getInventory().setItem(0, new ItemAPI("§6Schwert", Material.STONE_SWORD, 1, true).build());
-        player.getInventory().setItem(1, new ItemAPI("§6Bogen", Material.BOW, 1, true).build());
-        player.getInventory().setItem(2, new ItemAPI("§6Goldener Apfel", Material.GOLDEN_APPLE, 1, true).build());
-        player.getInventory().setBoots(new ItemAPI("§6Stiefel", Material.GOLDEN_BOOTS, 1, true).build());
-        player.getInventory().setLeggings(new ItemAPI("§6Hose", Material.IRON_LEGGINGS, 1, true).build());
-        player.getInventory().setHelmet(new ItemAPI("§6Helm", Material.IRON_HELMET, 1, true).build());
-        player.getInventory().addItem(new ItemAPI("§6Pfeil", Material.ARROW, 3).build());
+        player.getInventory().setItem(0, new ItemBuilder(Material.STONE_SWORD).displayname("§6Sword").unbreakable(true).build());
+        player.getInventory().setItem(1, new ItemBuilder(Material.BOW).displayname("§6Bow").unbreakable(true).build());
+        player.getInventory().setItem(2, new ItemBuilder(Material.GOLDEN_APPLE).displayname("§6Golden Apple").unbreakable(true).build());
+        player.getInventory().setBoots(new ItemBuilder(Material.GOLDEN_BOOTS).displayname("§6Boots").unbreakable(true).build());
+        player.getInventory().setLeggings(new ItemBuilder(Material.IRON_LEGGINGS).displayname("§6Leggings").unbreakable(true).build());
+        player.getInventory().setHelmet(new ItemBuilder(Material.IRON_HELMET).displayname("§6Helmet").unbreakable(true).build());
+        player.getInventory().addItem(new ItemBuilder(Material.ARROW).displayname("§6Arrow").amount(3).build());
 
-        GemgrabTeam team = teamManager.getPlayerTeam(player.getUniqueId());
-        switch (team.getTeamColor()) {
-            case BLUE -> {
-                player.getInventory().setChestplate(createBlueChestplate());
-            }
-            case RED -> {
-                player.getInventory().setChestplate(createRedChestplate());
-            }
+        switch (GameManager.getInstance().getPlayerGame(player).getPlayerTeam(player.getUniqueId())) {
+            case BLUE -> player.getInventory().setChestplate(createBlueChestplate());
+            case RED -> player.getInventory().setChestplate(createRedChestplate());
         }
 
     }
