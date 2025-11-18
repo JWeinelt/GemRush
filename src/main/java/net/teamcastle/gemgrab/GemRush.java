@@ -6,7 +6,6 @@ import lombok.Setter;
 import net.teamcastle.gemgrab.commands.GemRushCommand;
 import net.teamcastle.gemgrab.commands.GemRushCompleter;
 import net.teamcastle.gemgrab.commands.StatsCommand;
-import net.teamcastle.gemgrab.listener.JoinListener;
 import net.teamcastle.gemgrab.manager.GameManager;
 import net.teamcastle.gemgrab.storage.database.MySQLManager;
 import net.teamcastle.gemgrab.manager.game.GameState;
