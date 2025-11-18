@@ -1,10 +1,11 @@
 plugins {
     id 'java'
     id "com.github.johnrengelman.shadow" version "8.1.1"
+    id 'com.gradleup.shadow' version '8.3.0'
 }
 
 group = 'net.teamcastle'
-version = '1.0-BETA'
+version = '1.1.0'
 
 
 compileJava.options.encoding = 'UTF-8'
@@ -16,6 +17,10 @@ repositories {
         name = 'papermc'
         url = 'https://repo.papermc.io/repository/maven-public/'
     }
+    maven {
+        name = "unifiedvisionReleases"
+        url = uri("https://repo.codeblocksmc.de/releases")
+    }
 }
 
 java {
@@ -24,16 +29,20 @@ java {
 }
 
 dependencies {
-    compileOnly 'io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT'
+    compileOnly 'io.papermc.paper:paper-api:1.21.6-R0.1-SNAPSHOT'
     compileOnly 'org.jetbrains:annotations:24.1.0'
     implementation 'org.checkerframework:checker-qual:3.28.0'
     implementation("net.dv8tion:JDA:5.0.0-beta.20")
+    implementation("de.codeblocksmc.codelib:CodeLib:3.5.1")
+    implementation("com.codeblocksmc:TranslationSystem:4.1.0")
+    implementation 'fr.mrmicky:fastboard:2.1.5'
 
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
     testCompileOnly 'org.projectlombok:lombok:1.18.30'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
-    implementation platform('eu.cloudnetservice.cloudnet:bom:4.0.0-RC13')
-    compileOnly 'eu.cloudnetservice.cloudnet:driver-api'
-    compileOnly 'eu.cloudnetservice.cloudnet:bridge-api'
-    compileOnly 'eu.cloudnetservice.cloudnet:wrapper-jvm-api'}
+}
+
+shadowJar {
+    relocate 'fr.mrmicky.fastboard', 'net.teamcastle.gemgrab.scoreboard'
+}
