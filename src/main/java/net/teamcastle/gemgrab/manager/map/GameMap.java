@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,5 +35,21 @@ public class GameMap {
 
     public void addPlayerSpawn(Location loc, TeamColor color) {
         spawnPoints.computeIfAbsent(color, k -> new ArrayList<>()).add(LocUtil.fromBukkit(loc));
+    }
+
+    public GameMap remapAndClone(World world) {
+        LocationWrapper sp = new LocationWrapper(world.getName(), spawner.getX(), spawner.getY(), spawner.getZ(), spawner.getYaw(), spawner.getPitch());
+        GameMap n = new GameMap(sp, name);
+        LocationWrapper l1 = new LocationWrapper(world.getName(), arena.getL1().getX(), arena.getL1().getY(), arena.getL1().getZ(), arena.getL1().getYaw(), arena.getL1().getPitch());
+        LocationWrapper l2 = new LocationWrapper(world.getName(), arena.getL2().getX(), arena.getL2().getY(), arena.getL2().getZ(), arena.getL2().getYaw(), arena.getL2().getPitch());
+        n.setArena(new LocationSection(l1, l2));
+
+        for (TeamColor color : spawnPoints.keySet()) {
+            for (LocationWrapper loc : spawnPoints.get(color)) {
+                LocationWrapper nl = new LocationWrapper(world.getName(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+                n.addPlayerSpawn(LocUtil.fromWrapper(nl), color);
+            }
+        }
+        return n;
     }
 }
