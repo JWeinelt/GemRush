@@ -29,13 +29,15 @@ java {
 }
 
 dependencies {
-    compileOnly 'io.papermc.paper:paper-api:1.21.6-R0.1-SNAPSHOT'
+    compileOnly 'io.papermc.paper:paper-api:1.21.7-R0.1-SNAPSHOT'
     compileOnly 'org.jetbrains:annotations:24.1.0'
     implementation 'org.checkerframework:checker-qual:3.28.0'
     implementation("net.dv8tion:JDA:5.0.0-beta.20")
-    implementation("de.codeblocksmc.codelib:CodeLib:3.5.1")
+    implementation("de.codeblocksmc.codelib:CodeLib:3.5.2")
     implementation("com.codeblocksmc:TranslationSystem:4.1.0")
     implementation 'fr.mrmicky:fastboard:2.1.5'
+
+    implementation 'commons-io:commons-io:2.21.0'
 
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
@@ -44,5 +46,5 @@ dependencies {
 }
 
 shadowJar {
-    relocate 'fr.mrmicky.fastboard', 'net.teamcastle.gemgrab.scoreboard'
+    relocate 'fr.mrmicky.fastboard', 'net.teamcastle.gemgrab.manager.game'
 }
