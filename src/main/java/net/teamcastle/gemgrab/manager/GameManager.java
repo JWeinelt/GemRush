@@ -9,21 +9,21 @@ import java.util.List;
 
 public class GameManager {
     private final List<Game> games = new ArrayList<>();
+    private final GamePoolManager poolManager;
+
+    public GameManager(GamePoolManager poolManager) {
+        this.poolManager = poolManager;
+    }
 
     public static GameManager getInstance() {
         return GemRush.getInstance().getGameManager();
     }
 
     public void joinGame(Player player) {
+        Game game = poolManager.getPreparedGame();
+        game.joinGame(player);
 
-    }
-
-    public void registerGame(Game game) {
-
-    }
-
-    public Game createOrFindGame() {
-        return null;
+        poolManager.onPlayerJoin(game);
     }
 
     public Game getPlayerGame(Player player) {
