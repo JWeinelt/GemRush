@@ -28,6 +28,15 @@ public class LocalStorage {
         logger = GemRush.getInstance().getLogger();
     }
 
+    public GameMap getMap(String name) {
+        for (GameMap map : gameMaps) {
+            if (map.getName().equalsIgnoreCase(name)) {
+                return map;
+            }
+        }
+        return null;
+    }
+
     public static LocalStorage getInstance() {
         return GemRush.getInstance().getLocalStorage();
     }
