@@ -40,6 +40,9 @@ public class GemRushCommand implements CommandExecutor {
                 } else if (args[0].equalsIgnoreCase("help")) {
                     player.sendMessage("§e=== §6GemRush Help §e===");
                     player.sendMessage("Use §a/gemrush§7 to see a list of commands.");
+                } else if (args[0].equalsIgnoreCase("reload")) {
+                    player.sendMessage("§2Reloading §econfiguration data...");
+
                 } else {
                     player.sendMessage("§cUnknown subcommand. Use §a/gemrush help §7for assistance.");
                 }
