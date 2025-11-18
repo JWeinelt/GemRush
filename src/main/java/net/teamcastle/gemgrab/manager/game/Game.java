@@ -20,7 +20,6 @@ import net.teamcastle.gemgrab.manager.player.PlayerManager;
 import net.teamcastle.gemgrab.manager.teams.TeamColor;
 import net.teamcastle.gemgrab.storage.Configuration;
 import org.bukkit.*;
-import org.bukkit.block.data.type.TNT;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -39,7 +38,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
-import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -47,6 +45,7 @@ import java.util.logging.Logger;
 
 import static net.teamcastle.gemgrab.GemRush.mainPrefix;
 
+@SuppressWarnings("unused")
 @Getter
 public class Game implements Listener {
     private final Logger log = GemRush.getInstance().getLog();
@@ -59,9 +58,9 @@ public class Game implements Listener {
     private BossBar bossBar;
 
 
-    private AtomicInteger starterCountdown = new AtomicInteger(60);
+    private final AtomicInteger starterCountdown = new AtomicInteger(60);
 
-    private World world;
+    private final World world;
     private World lobby;
 
     private long timeLeft;
@@ -94,10 +93,6 @@ public class Game implements Listener {
         players.put(TeamColor.BLUE, new ArrayList<>());
 
         timeLeft = Configuration.getInstance().getGameDuration();
-    }
-
-    public boolean canJoin() {
-        return getPlayerCount() < map.getMaxPlayers() && state == GameState.LOBBY;
     }
 
     public List<GPlayer> getTeam(TeamColor c) {
@@ -209,9 +204,7 @@ public class Game implements Listener {
 
         bossBar.addPlayer(player);
 
-        executeForPlayers(p -> {
-            p.sendMessage(mainPrefix + "§e" + player.getName() + " §7has joined the game!");
-        });
+        executeForPlayers(p -> p.sendMessage(mainPrefix + "§e" + player.getName() + " §7has joined the game!"));
 
         player.teleport(lobbySpawn());
         FastBoardManager.getInstance().createScoreboard(player);
@@ -235,9 +228,7 @@ public class Game implements Listener {
 
         bossBar.removePlayer(player);
 
-        executeForPlayers(p -> {
-            p.sendMessage(mainPrefix + "§e" + player.getName() + " §7has left the game!");
-        });
+        executeForPlayers(p -> p.sendMessage(mainPrefix + "§e" + player.getName() + " §7has left the game!"));
         if (getFillPercentage() < Configuration.getInstance().getMinPlayersToStart() && state == GameState.STARTING) {
             state = GameState.LOBBY;
             sendMessageToPlayersTranslated("gem.game.not-enough", true);
