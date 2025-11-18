@@ -93,6 +93,8 @@ public class Game implements Listener {
         players.put(TeamColor.BLUE, new ArrayList<>());
 
         timeLeft = Configuration.getInstance().getGameDuration();
+
+        Bukkit.getPluginManager().registerEvents(this, GemRush.getInstance());
     }
 
     public List<GPlayer> getTeam(TeamColor c) {
