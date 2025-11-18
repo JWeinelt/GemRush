@@ -1,64 +1,32 @@
 package net.teamcastle.gemgrab.commands;
 
-import net.teamcastle.gemgrab.TeamcastleGemgrab;
-import net.teamcastle.gemgrab.manager.database.MySQLManager;
-import net.teamcastle.gemgrab.utils.Messages;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
+import net.teamcastle.gemgrab.manager.game.PlayerStat;
+import net.teamcastle.gemgrab.manager.game.StatManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.sql.SQLException;
-import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 public class StatsCommand implements CommandExecutor {
-
-    private final TeamcastleGemgrab plugin;
-    private final MySQLManager sql;
-
-    public StatsCommand(TeamcastleGemgrab plugin) {
-        this.plugin = plugin;
-        this.sql = plugin.getMySQLManager();
-    }
-
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+                             String @NotNull [] args) {
 
-        if (args.length == 0 && !(sender instanceof Player)) {
-            sender.sendMessage(Messages.mainPrefix + ChatColor.RED + "Du musst einen Spielernamen angeben.");
+        if (!(sender instanceof Player player)) {
             return true;
         }
 
-        OfflinePlayer target = (args.length == 0)
-                ? (Player) sender
-                : Bukkit.getOfflinePlayer(args[0]);
+        PlayerStat s = StatManager.getInstance().getPlayerStat(player.getUniqueId());
 
-        if (target.getName() == null) {
-            sender.sendMessage(Messages.mainPrefix + "§cDieser Spieler wurde nicht gefunden.");
-            return true;
-        }
-
-        UUID uuid = target.getUniqueId();
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            try {
-                int kills = sql.getStat(uuid, "kills");
-                int deaths = sql.getStat(uuid, "deaths");
-                int wins = sql.getStat(uuid, "wins");
-
-                sender.sendMessage(Messages.mainPrefix + "§7Stats von §6" + target.getName() + "§7:");
-                sender.sendMessage(Messages.mainPrefix + "§a§lKills: §7" + kills);
-                sender.sendMessage(Messages.mainPrefix + "§c§lTode: §7" + deaths);
-                sender.sendMessage(Messages.mainPrefix + "§e§lSiege: §7" + wins);
-
-            } catch (SQLException e) {
-                sender.sendMessage(Messages.mainPrefix + ChatColor.RED + "Fehler beim Abrufen der Statistiken.");
-                e.printStackTrace();
-            }
-        });
-
+        player.sendMessage("§e======= §aGemRush Stats §e=======");
+        player.sendMessage("§aKills: §e%s".formatted(s.getKills()));
+        player.sendMessage("§aDeaths: §e%s".formatted(s.getDeaths()));
+        player.sendMessage("§aK/D Ratio: §e%.2f".formatted((s.getDeaths() == 0) ? s.getKills() : (double) s.getKills() / s.getDeaths()));
+        player.sendMessage("§aWins: §e%s §7(%s§7)".formatted(s.getWins(), (s.getWins() * 1.0 / s.getPlayed())));
+        player.sendMessage("§aLost: §e%s".formatted(s.getLost()));
+        player.sendMessage("§aGames Played: §e%s".formatted(s.getPlayed()));
+        player.sendMessage("§e============================");
         return true;
     }
 }
