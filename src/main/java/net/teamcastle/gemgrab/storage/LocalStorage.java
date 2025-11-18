@@ -1,0 +1,83 @@
+package net.teamcastle.gemgrab.storage;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import lombok.Getter;
+import net.teamcastle.gemgrab.GemRush;
+import net.teamcastle.gemgrab.manager.map.GameMap;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
+public class LocalStorage {
+    private final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private final File configFile;
+    private final Logger logger;
+
+    @Getter
+    private List<GameMap> gameMaps = new ArrayList<>();
+
+    @Getter
+    private Configuration config;
+
+    public LocalStorage() {
+        configFile = new File(GemRush.getInstance().getDataFolder(), "config.json");
+        config = new Configuration();
+        logger = GemRush.getInstance().getLogger();
+    }
+
+    public static LocalStorage getInstance() {
+        return GemRush.getInstance().getLocalStorage();
+    }
+
+    public void loadConfig() {
+        if (!configFile.exists()) {
+            saveConfig();
+        }
+        try (BufferedReader br = new BufferedReader(new FileReader(configFile))) {
+            String line;
+            StringBuilder json = new StringBuilder();
+            while ((line = br.readLine()) != null) {
+                json.append(line);
+            }
+            config = GSON.fromJson(json.toString(), Configuration.class);
+        } catch (IOException e) {
+            logger.severe(e.getMessage());
+        }
+    }
+
+    public void saveConfig() {
+        try (FileWriter w = new FileWriter(configFile)) {
+            w.write(GSON.toJson(config));
+        } catch (IOException e) {
+            logger.severe(e.getMessage());
+        }
+    }
+
+    public void saveMaps() {
+        try (FileWriter w = new FileWriter(new File(GemRush.getInstance().getDataFolder(), "maps.json"))) {
+            w.write(GSON.toJson(gameMaps));
+        } catch (IOException e) {
+            logger.severe(e.getMessage());
+        }
+    }
+    public void loadMaps() {
+        File mapsFile = new File(GemRush.getInstance().getDataFolder(), "maps.json");
+        if (!mapsFile.exists()) {
+            saveMaps();
+        }
+        try (BufferedReader br = new BufferedReader(new FileReader(mapsFile))) {
+            String line;
+            StringBuilder json = new StringBuilder();
+            while ((line = br.readLine()) != null) {
+                json.append(line);
+            }
+            GameMap[] mapsArray = GSON.fromJson(json.toString(), GameMap[].class);
+            gameMaps = List.of(mapsArray);
+        } catch (IOException e) {
+            logger.severe(e.getMessage());
+        }
+    }
+}
