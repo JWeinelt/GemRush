@@ -7,19 +7,18 @@ import net.teamcastle.gemgrab.commands.GemRushCommand;
 import net.teamcastle.gemgrab.commands.GemRushCompleter;
 import net.teamcastle.gemgrab.commands.StatsCommand;
 import net.teamcastle.gemgrab.manager.GameManager;
-import net.teamcastle.gemgrab.storage.database.MySQLManager;
 import net.teamcastle.gemgrab.manager.game.GameState;
 import net.teamcastle.gemgrab.manager.game.StatManager;
 import net.teamcastle.gemgrab.manager.items.gameitems.GameItemManager;
 import net.teamcastle.gemgrab.manager.map.GameMap;
 import net.teamcastle.gemgrab.manager.map.GameMapManager;
 import net.teamcastle.gemgrab.storage.LocalStorage;
+import net.teamcastle.gemgrab.storage.database.MySQLManager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -65,6 +64,7 @@ public final class GemRush extends JavaPlugin {
         log.info("Loading configuration...");
         localStorage = new LocalStorage();
         localStorage.loadConfig();
+        localStorage.loadMaps();
         log.info("Initializing stats...");
         statManager = new StatManager();
         gamestate = GameState.LOBBY;
