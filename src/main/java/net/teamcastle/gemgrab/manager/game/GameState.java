@@ -1,9 +1,9 @@
 package net.teamcastle.gemgrab.manager.game;
 
-public enum Gamestate {
+public enum GameState {
 
     LOBBY,
     STARTING,
-    INGAME,
+    RUNNING,
     ENDED
 }
