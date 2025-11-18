@@ -7,9 +7,13 @@ import net.teamcastle.gemgrab.commands.GemRushCommand;
 import net.teamcastle.gemgrab.commands.GemRushCompleter;
 import net.teamcastle.gemgrab.commands.StatsCommand;
 import net.teamcastle.gemgrab.manager.GameManager;
+import net.teamcastle.gemgrab.manager.GamePoolManager;
+import net.teamcastle.gemgrab.manager.WorldManager;
+import net.teamcastle.gemgrab.manager.game.FastBoardManager;
 import net.teamcastle.gemgrab.manager.game.GameState;
 import net.teamcastle.gemgrab.manager.game.StatManager;
 import net.teamcastle.gemgrab.manager.items.gameitems.GameItemManager;
+import net.teamcastle.gemgrab.manager.lobby.LobbyManager;
 import net.teamcastle.gemgrab.manager.map.GameMap;
 import net.teamcastle.gemgrab.manager.map.GameMapManager;
 import net.teamcastle.gemgrab.storage.LocalStorage;
@@ -51,6 +55,11 @@ public final class GemRush extends JavaPlugin {
     private LocalStorage localStorage;
     private StatManager statManager;
     private GameManager gameManager;
+    private GamePoolManager gamePool;
+    private LobbyManager lobbyManager;
+    private WorldManager worldManager;
+
+    private FastBoardManager fastBoardManager;
 
     @Override
     public void onLoad() {
@@ -73,10 +82,30 @@ public final class GemRush extends JavaPlugin {
         mySQLManager = new MySQLManager(localStorage.getConfig());
         mySQLManager.connect();
 
+        log.info("Preparing world management...");
+
+        worldManager = new WorldManager();
+
+        fastBoardManager = new FastBoardManager();
+
         this.gameMapManager = new GameMapManager();
         this.gameItemManager = new GameItemManager();
+
+        log.info("Starting game pool...");
+
+        gamePool = new GamePoolManager(worldManager);
+        gamePool.loadAvailableMaps();
+        gamePool.prepareNewGame();
+
+        log.info("Starting game manager...");
+        gameManager = new GameManager(gamePool);
+        log.info("Preparing lobby management...");
+        lobbyManager = new LobbyManager(worldManager);
+        log.info("Almost done! Registering commands...");
         registerCommands();
+        log.info("Setting world settings...");
         setWorldSettings();
+        log.info("Plugin startup complete! GemRush is now enabled.");
     }
 
     public void registerCommands() {
