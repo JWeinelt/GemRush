@@ -11,19 +11,15 @@ public class Configuration {
         return LocalStorage.getInstance().getConfig();
     }
 
-    private String mysqlHost;
-    private int mysqlPort;
-    private String mysqlDatabase;
-    private String mysqlUser;
-    private String mysqlPassword;
+    private String mysqlHost = "10.0.0.1";
+    private int mysqlPort = 3306;
+    private String mysqlDatabase = "plugins";
+    private String mysqlUser = "gemrush";
+    private String mysqlPassword = "password";
 
-    private int minPlayers;
-    private int maxPlayers;
-    private int gameDuration;
-    private int gemSpawnInterval;
-
-    private int lobbyCountdown;
-    private int gameRestartDelay;
+    private int gameDuration = 600;
+    private int gemSpawnInterval = 10;
+    private double minPlayersToStart = 0.8;
 
     private LocationWrapper lobbySpawn;
 }
