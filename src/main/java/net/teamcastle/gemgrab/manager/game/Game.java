@@ -310,7 +310,8 @@ public class Game implements Listener {
                     LocationWrapper spawnLoc = map.getSpawnPoints().get(c).get(new Random().nextInt(map.getSpawnPoints().get(c).size()));
                     player.teleport(LocUtil.fromWrapper(spawnLoc));
                     player.playSound(player, Sound.ITEM_FIRECHARGE_USE, 1, 1);
-                    player.showTitle(Title.title(Component.text("§aGame started"), Component.text("§eGood luck!")));
+                    player.showTitle(Title.title(Component.text(translate("gem.game.started", player)),
+                            Component.text(translate("gem.game.started.luck", player))));
                 });
             }
         }
@@ -338,7 +339,8 @@ public class Game implements Listener {
 
                 if (secondsLeft == 0) {
                     Bukkit.getOnlinePlayers().forEach(player -> {
-                        player.sendTitle("§a§lGame started", "§eGood luck");
+                        player.showTitle(Title.title(Component.text(translate("gem.game.started", player)),
+                                Component.text(translate("gem.game.started.luck", player))));
                         player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 3, 10);
                     });
                     startGame();
@@ -375,7 +377,7 @@ public class Game implements Listener {
     }
 
     private void suddenDeath() {
-        sendMessageToPlayers(mainPrefix + "§eThe game ended in a draw! Sudden death starts now!");
+        sendMessageToPlayersTranslated("gem.game.draw", true);
         timeLeft = 60;
 
         int yUpperBound = (int) Math.max(map.getArena().getL1().getY(), map.getArena().getL2().getY());
