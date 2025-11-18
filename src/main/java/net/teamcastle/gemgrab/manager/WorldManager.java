@@ -124,4 +124,53 @@ public class WorldManager {
             }
         }.runTaskLater(GemRush.getInstance(), 20);
     }
+
+
+    public void cleanup() {
+        log.info("Cleaning up all temporary worlds…");
+
+        File worldContainer = Bukkit.getWorldContainer();
+        File templatesFolder = new File(GemRush.getInstance().getDataFolder(), "Templates");
+        File[] worlds = worldContainer.listFiles(File::isDirectory);
+
+        if (worlds == null) return;
+        for (File folder : worlds) {
+            String name = folder.getName();
+
+            if (name.equals("world") || name.equals("world_nether") || name.equals("world_the_end"))
+                continue;
+
+            if (folder.equals(templatesFolder))
+                continue;
+
+            boolean isGemRushWorld =
+                    name.startsWith("Lobby_") ||
+                            name.startsWith("Lobby_spare") ||
+                            name.startsWith("Game_");
+
+            if (!isGemRushWorld) continue;
+
+            log.info("Cleaning world: " + name);
+
+            World w = Bukkit.getWorld(name);
+            if (w != null) {
+                w.getEntities().forEach(Entity::remove);
+                boolean unloaded = Bukkit.unloadWorld(w, false);
+                if (!unloaded) {
+                    log.warning("Could not unload world during cleanup: " + name);
+                    continue;
+                }
+            }
+
+            try {
+                FileUtils.deleteDirectory(folder);
+                log.info("Deleted world folder: " + folder.getName());
+            } catch (IOException e) {
+                log.warning("Could not delete world folder: " + folder.getName());
+            }
+        }
+
+        log.info("All temporary worlds cleaned successfully.");
+    }
+
 }

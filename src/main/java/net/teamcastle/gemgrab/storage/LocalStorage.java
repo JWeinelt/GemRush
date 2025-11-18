@@ -65,6 +65,30 @@ public class LocalStorage {
         }
     }
 
+    public void saveConfigNonReplace() {
+        if (!configFile.exists()) {
+            return;
+        }
+        try (BufferedReader br = new BufferedReader(new FileReader(configFile))) {
+            String line;
+            StringBuilder json = new StringBuilder();
+            while ((line = br.readLine()) != null) {
+                json.append(line);
+            }
+            Configuration c = GSON.fromJson(json.toString(), Configuration.class);
+            if (!c.equals(config)) {
+                try (FileWriter w = new FileWriter(new File(GemRush.getInstance().getDataFolder(), "config.json.bak"))) {
+                    w.write(GSON.toJson(config));
+                }
+
+                logger.warning("Detected changes of config.json on disk, saving current config to config.json.bak");
+            }
+        } catch (IOException e) {
+            logger.severe("Failed to read/write config for non-replace save!");
+            logger.severe(e.getMessage());
+        }
+    }
+
     public void saveMaps() {
         try (FileWriter w = new FileWriter(new File(GemRush.getInstance().getDataFolder(), "maps.json"))) {
             w.write(GSON.toJson(gameMaps));
