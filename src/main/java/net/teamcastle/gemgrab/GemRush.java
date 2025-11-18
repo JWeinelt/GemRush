@@ -87,6 +87,7 @@ public final class GemRush extends JavaPlugin {
         worldManager = new WorldManager();
 
         fastBoardManager = new FastBoardManager();
+        fastBoardManager.startTask();
 
         this.gameMapManager = new GameMapManager();
         this.gameItemManager = new GameItemManager();
@@ -128,6 +129,8 @@ public final class GemRush extends JavaPlugin {
     @Override
     public void onDisable() {
         log.info("Disabling GemRush...");
+        log.info("Stopping FastBoard...");
+        fastBoardManager.stop();
         log.info("Saving stats before disabling...");
         if (mySQLManager != null) mySQLManager.uploadStats();
         else {
