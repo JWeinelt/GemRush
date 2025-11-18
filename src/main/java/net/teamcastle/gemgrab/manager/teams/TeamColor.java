@@ -27,4 +27,8 @@ public enum TeamColor {
         int redPlayers = game.getPlayers().get(RED).size();
         return bluePlayers <= redPlayers ? BLUE : RED;
     }
+
+    public static TeamColor opposite(TeamColor teamColor) {
+        return teamColor == BLUE ? RED : BLUE;
+    }
 }
