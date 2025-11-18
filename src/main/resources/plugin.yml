@@ -1,10 +1,9 @@
-name: TeamcastleGemgrab
+name: GemRush
 version: '${version}'
-main: net.teamcastle.gemgrab.TeamcastleGemgrab
+main: net.teamcastle.gemgrab.GemRush
 api-version: '1.21'
 commands:
-  setlobbyspawn:
-  createmap:
-  setgamespawn:
-  start:
   stats:
+    description: View your gemrush stats
+  gemrush:
+    description: Manage GemRush games
