@@ -22,4 +22,25 @@ public class Configuration {
     private double minPlayersToStart = 0.8;
 
     private LocationWrapper lobbySpawn;
+
+    public String connectionID() {
+        return "%s@%s:%s/%s-with:%s";
+    }
+
+    @Override
+    public int hashCode() {
+        return mysqlHost.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Configuration that = (Configuration) obj;
+        return mysqlHost.equals(that.mysqlHost) && mysqlPort == that.mysqlPort
+                && mysqlDatabase.equals(that.mysqlDatabase) && mysqlUser.equals(that.mysqlUser)
+                && mysqlPassword.equals(that.mysqlPassword) && gameDuration == that.gameDuration
+                && gemSpawnInterval == that.gemSpawnInterval && that.minPlayersToStart == minPlayersToStart
+                && ((lobbySpawn == null && that.lobbySpawn == null) || (lobbySpawn != null && lobbySpawn.equals(that.lobbySpawn)));
+    }
 }
