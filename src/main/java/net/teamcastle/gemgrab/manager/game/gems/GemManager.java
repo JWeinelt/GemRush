@@ -1,12 +1,10 @@
 package net.teamcastle.gemgrab.manager.game.gems;
 
-import net.teamcastle.gemgrab.TeamcastleGemgrab;
-import net.teamcastle.gemgrab.manager.game.Gamestate;
-import net.teamcastle.gemgrab.manager.game.gameplay.BossbarHandler;
-import net.teamcastle.gemgrab.manager.teams.TeamColor;
-import net.teamcastle.gemgrab.manager.teams.TeamManager;
 import lombok.RequiredArgsConstructor;
+import net.teamcastle.gemgrab.manager.game.Game;
+import net.teamcastle.gemgrab.manager.teams.TeamColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,8 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @RequiredArgsConstructor
 public class GemManager {
-
-    private final TeamManager teamManager;
+    private final Game game;
 
     public int calculateTeamGemsBlue() {
         return calculateTeamGemsByColor(TeamColor.BLUE);
@@ -29,14 +26,14 @@ public class GemManager {
     private int calculateTeamGemsByColor(TeamColor teamColor) {
         AtomicInteger gemCount = new AtomicInteger();
 
-        var team = teamManager.getTeamByColor(teamColor);
+        var team = game.getTeam(teamColor);
         if (team == null) {
             Bukkit.getLogger().warning("Das Team " + teamColor + " existiert nicht!");
             return 0;
         }
 
-        team.getPlayers().forEach(uuid -> {
-            Player player = Bukkit.getPlayer(uuid);
+        team.forEach(gPlayer -> {
+            Player player = Bukkit.getPlayer(gPlayer.getUuid());
             if (player != null) {
                 for (ItemStack item : player.getInventory().getContents()) {
                     if (item != null && isGem(item)) {
@@ -49,36 +46,6 @@ public class GemManager {
     }
 
     private boolean isGem(ItemStack item) {
-        ItemMeta meta = item.getItemMeta();
-        return meta != null && meta.hasDisplayName() && "§2§lGEM".equals(meta.getDisplayName());
-    }
-
-    public void checkForCountdown() {
-        int win = 10;
-        if (TeamcastleGemgrab.getGamestate().equals(Gamestate.INGAME)) {
-            if (calculateTeamGemsBlue() >= win) {
-                if (!BossbarHandler.isCountdownRunning(BossbarHandler.TeamColor.RED)) {
-                    if (!BossbarHandler.isCountdownRunning(BossbarHandler.TeamColor.BLUE)) {
-                        BossbarHandler.startBossBarCountdown(BossbarHandler.TeamColor.BLUE, 15);
-                    }
-                }
-            } else {
-                if (BossbarHandler.isCountdownRunning(BossbarHandler.TeamColor.BLUE)) {
-                    BossbarHandler.stopBossBarCountdown(BossbarHandler.TeamColor.BLUE);
-                }
-            }
-
-            if (calculateTeamGemsRed() >= win) {
-                if (!BossbarHandler.isCountdownRunning(BossbarHandler.TeamColor.BLUE)) {
-                    if (!BossbarHandler.isCountdownRunning(BossbarHandler.TeamColor.RED)) {
-                        BossbarHandler.startBossBarCountdown(BossbarHandler.TeamColor.RED, 15);
-                    }
-                }
-            } else {
-                if (BossbarHandler.isCountdownRunning(BossbarHandler.TeamColor.RED)) {
-                    BossbarHandler.stopBossBarCountdown(BossbarHandler.TeamColor.RED);
-                }
-            }
-        }
+        return item.getType().equals(Material.EMERALD);
     }
 }
