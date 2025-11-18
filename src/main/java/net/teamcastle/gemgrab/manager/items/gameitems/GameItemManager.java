@@ -3,6 +3,7 @@ package net.teamcastle.gemgrab.manager.items.gameitems;
 import de.codeblocksmc.codelib.wrapping.ItemBuilder;
 import net.teamcastle.gemgrab.GemRush;
 import net.teamcastle.gemgrab.manager.GameManager;
+import net.teamcastle.gemgrab.manager.game.Game;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -24,7 +25,7 @@ public class GameItemManager {
                 .unbreakable(true).flags(ItemFlag.HIDE_UNBREAKABLE).build();
     }
 
-    public void setGameItems(Player player) {
+    public void setGameItems(Player player, Game game) {
         player.getInventory().clear();
 
         player.getInventory().setItem(0, new ItemBuilder(Material.STONE_SWORD).displayname("§6Sword").unbreakable(true).build());
@@ -35,7 +36,7 @@ public class GameItemManager {
         player.getInventory().setHelmet(new ItemBuilder(Material.IRON_HELMET).displayname("§6Helmet").unbreakable(true).build());
         player.getInventory().addItem(new ItemBuilder(Material.ARROW).displayname("§6Arrow").amount(3).build());
 
-        switch (GameManager.getInstance().getPlayerGame(player).getPlayerTeam(player.getUniqueId())) {
+        switch (game.getPlayerTeam(player.getUniqueId())) {
             case BLUE -> player.getInventory().setChestplate(createBlueChestplate());
             case RED -> player.getInventory().setChestplate(createRedChestplate());
         }

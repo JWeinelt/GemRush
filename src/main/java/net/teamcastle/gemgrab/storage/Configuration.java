@@ -18,7 +18,7 @@ public class Configuration {
     private String mysqlPassword = "password";
 
     private int gameDuration = 600;
-    private int gemSpawnInterval = 10;
+    private int gemSpawnInterval = 30;
     private double minPlayersToStart = 0.8;
 
     private LocationWrapper lobbySpawn;

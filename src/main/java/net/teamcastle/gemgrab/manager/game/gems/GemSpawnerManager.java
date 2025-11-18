@@ -29,7 +29,7 @@ public class GemSpawnerManager {
     public void spawnGems(Location location) {
         Location spawnLocation = location.clone().add(0.5, 1, 0.5);
         Bukkit.getScheduler().runTaskTimer(GemRush.getInstance(), ()-> {
-            if (!GemRush.getGamestate().equals(GameState.ENDED)) {
+            if (!game.getState().equals(GameState.ENDED)) {
                 if (gemCountdown > 1) {
                     gemCountdown--;
                 } else {

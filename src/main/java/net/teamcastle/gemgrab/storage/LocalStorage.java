@@ -1,5 +1,6 @@
 package net.teamcastle.gemgrab.storage;
 
+import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import net.teamcastle.gemgrab.GemRush;
 import net.teamcastle.gemgrab.manager.map.GameMap;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -107,8 +109,8 @@ public class LocalStorage {
             while ((line = br.readLine()) != null) {
                 json.append(line);
             }
-            GameMap[] mapsArray = GSON.fromJson(json.toString(), GameMap[].class);
-            gameMaps = List.of(mapsArray);
+            Type type = new TypeToken<List<GameMap>>() {}.getType();
+            gameMaps = GSON.fromJson(json.toString(), type);
         } catch (IOException e) {
             logger.severe(e.getMessage());
         }

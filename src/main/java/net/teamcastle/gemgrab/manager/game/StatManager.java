@@ -3,6 +3,8 @@ package net.teamcastle.gemgrab.manager.game;
 import lombok.Getter;
 import net.teamcastle.gemgrab.GemRush;
 import net.teamcastle.gemgrab.storage.database.MySQLManager;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -15,6 +17,12 @@ public class StatManager {
 
     public static StatManager getInstance() {
         return GemRush.getInstance().getStatManager();
+    }
+
+    public void cacheOnline() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            getPlayerStat(player.getUniqueId());
+        }
     }
 
     @NotNull

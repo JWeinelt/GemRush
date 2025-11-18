@@ -20,6 +20,10 @@ import java.util.logging.Logger;
 public class WorldManager {
     private Logger log = GemRush.getInstance().getLogger();
 
+    public static WorldManager getInstance() {
+        return GemRush.getInstance().getWorldManager();
+    }
+
 
     public void copyWorld(File source, File target) throws IOException {
         if (!target.exists()) target.mkdirs();

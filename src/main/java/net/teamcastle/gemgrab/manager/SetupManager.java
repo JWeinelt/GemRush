@@ -6,9 +6,11 @@ import de.codeblocksmc.codelib.locations.LocationWrapper;
 import de.codeblocksmc.codelib.wrapping.ItemBuilder;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.teamcastle.gemgrab.GemRush;
 import net.teamcastle.gemgrab.manager.map.GameMap;
 import net.teamcastle.gemgrab.manager.teams.TeamColor;
 import net.teamcastle.gemgrab.storage.LocalStorage;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -19,7 +21,19 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SetupManager implements Listener {
+    private final List<SetupManager> managers = new ArrayList<>();
+
+
+    public SetupManager(String mapName, Player player) {
+        managers.add(this);
+        startSetup(player, mapName);
+    }
+
+
     private final ItemStack setupWand = new ItemBuilder(Material.IRON_AXE).displayname("§eLocation Wand").build();
     private final ItemStack arenaSetter = new ItemBuilder(Material.IRON_SWORD).displayname("§aSet arena corners").build();
     private final ItemStack playerCount = new ItemBuilder(Material.PLAYER_HEAD).displayname("§eSet Player Count §7(§4§l-§7/§2§l+§7)").build();
@@ -35,7 +49,11 @@ public class SetupManager implements Listener {
     private Player player;
 
     public void startSetup(Player player, String mapName) {
+        GemRush.getInstance().getLog().info("Starting setup for map " + mapName);
+        this.player = player;
         map = new GameMap(null, mapName);
+
+        player.getInventory().clear();
 
         player.getInventory().setItem(0, setupWand);
         player.getInventory().setItem(7, playerCount);
@@ -44,6 +62,8 @@ public class SetupManager implements Listener {
         player.getInventory().setItem(3, playerSpawnBlue);
         player.getInventory().setItem(4, arenaSetter);
         player.getInventory().setItem(8, saveSetup);
+
+        Bukkit.getPluginManager().registerEvents(this, GemRush.getInstance());
     }
 
     @EventHandler
@@ -75,7 +95,7 @@ public class SetupManager implements Listener {
                     player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1, 2);
                 }
             }
-        } else if (item.equals(playerCount)) {
+        } if (item.getType().equals(Material.PLAYER_HEAD)) {
             e.setCancelled(true);
             if (e.getAction().isLeftClick()) {
                 if (map.getMaxPlayers() <= 1) return;
@@ -107,10 +127,12 @@ public class SetupManager implements Listener {
             Audience.audience(player).sendActionBar(Component.text("§aGem Spawner set!"));
             player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1, 2);
         } else if (item.equals(playerSpawnRed)) {
+            e.setCancelled(true);
             map.addPlayerSpawn(player.getLocation(), TeamColor.RED);
             Audience.audience(player).sendActionBar(Component.text("§aPlayer spawn added!"));
             player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1, 2);
         } else if (item.equals(playerSpawnBlue)) {
+            e.setCancelled(true);
             map.addPlayerSpawn(player.getLocation(), TeamColor.BLUE);
             Audience.audience(player).sendActionBar(Component.text("§aPlayer spawn added!"));
             player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1, 2);
@@ -131,8 +153,9 @@ public class SetupManager implements Listener {
 
 
             World w = player.getWorld();
-            w.save();
-
+            WorldManager.getInstance().saveAsTemplate(w);
+            player.getInventory().clear();
+            player.sendMessage("§2Done!");
         }
     }
 }

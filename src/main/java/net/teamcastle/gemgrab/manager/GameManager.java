@@ -27,6 +27,10 @@ public class GameManager {
     }
 
     public Game getPlayerGame(Player player) {
+        for (Game g : games) {
+            if (g.hasPlayer(player.getUniqueId())) return g;
+        }
+        if (poolManager.getPreparedGame().hasPlayer(player.getUniqueId())) return poolManager.getPreparedGame();
         return null;
     }
 }

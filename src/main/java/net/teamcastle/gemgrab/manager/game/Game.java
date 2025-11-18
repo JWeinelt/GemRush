@@ -13,6 +13,7 @@ import net.teamcastle.gemgrab.manager.GameManager;
 import net.teamcastle.gemgrab.manager.GamePoolManager;
 import net.teamcastle.gemgrab.manager.game.gems.GemManager;
 import net.teamcastle.gemgrab.manager.game.gems.GemSpawnerManager;
+import net.teamcastle.gemgrab.manager.items.gameitems.GameItemManager;
 import net.teamcastle.gemgrab.manager.lobby.LobbyManager;
 import net.teamcastle.gemgrab.manager.map.GameMap;
 import net.teamcastle.gemgrab.manager.player.GPlayer;
@@ -95,10 +96,20 @@ public class Game implements Listener {
         timeLeft = Configuration.getInstance().getGameDuration();
 
         Bukkit.getPluginManager().registerEvents(this, GemRush.getInstance());
+        Bukkit.getPluginManager().registerEvents(playerListener, GemRush.getInstance());
     }
 
     public List<GPlayer> getTeam(TeamColor c) {
         return players.get(c);
+    }
+
+    public boolean hasPlayer(UUID uuid) {
+        for (TeamColor c : players.keySet()) {
+            for (GPlayer g : players.get(c)) {
+                if (g.getUuid().equals(uuid)) return true;
+            }
+        }
+        return false;
     }
 
     public double getFillPercentage() {
@@ -163,12 +174,14 @@ public class Game implements Listener {
 
     public void executeForPlayers(Consumer<Player> action) {
         for (GPlayer player : getAllPlayers()) {
+            if (player == null) continue;
             player.asPlayer().ifPresent(action);
         }
     }
 
     public void executeForPlayers(TeamColor c, Consumer<Player> action) {
         for (GPlayer player : players.get(c)) {
+            if (player == null) continue;
             player.asPlayer().ifPresent(action);
         }
     }
@@ -202,7 +215,7 @@ public class Game implements Listener {
     public void joinGame(Player player) {
         if (getPlayerCount() == 0) createBossBar();
         TeamColor teamColor = TeamColor.getTeamWithLeastPlayers(this);
-        players.get(teamColor).add(PlayerManager.getGemgrabPlayerByUUID(player.getUniqueId()));
+        players.get(teamColor).add(PlayerManager.getGemGrabPlayerByUUID(player.getUniqueId()));
 
         bossBar.addPlayer(player);
 
@@ -245,7 +258,7 @@ public class Game implements Listener {
 
 
     public void endGame(TeamColor teamColor, BossBar bossBar) {
-        GemRush.setGamestate(GameState.ENDED);
+        state = GameState.ENDED;
 
         executeForPlayers(teamColor, player -> {
             StatManager.getInstance().addWin(player.getUniqueId());
@@ -299,15 +312,11 @@ public class Game implements Listener {
 
         for (TeamColor c : players.keySet()) {
             for (GPlayer gPlayer : players.get(c)) {
-                gPlayer.asPlayer().ifPresent(player -> {
-                    LocationWrapper spawnLoc = map.getSpawnPoints().get(c).get(new Random().nextInt(map.getSpawnPoints().get(c).size()));
-                    player.teleport(LocUtil.fromWrapper(spawnLoc));
-                    player.playSound(player, Sound.ITEM_FIRECHARGE_USE, 1, 1);
-                    player.showTitle(Title.title(Component.text(translate("gem.game.started", player)),
-                            Component.text(translate("gem.game.started.luck", player))));
-                });
+                gPlayer.asPlayer().ifPresent(this::spawnPlayer);
             }
         }
+
+        gemSpawnerManager.spawnGems(LocUtil.fromWrapper(map.getSpawner()));
 
         gameTask = new BukkitRunnable() {
             @Override
@@ -315,6 +324,16 @@ public class Game implements Listener {
                 tick();
             }
         }.runTaskTimer(GemRush.getInstance(), 0, 20);
+    }
+
+    public void spawnPlayer(Player player) {
+        TeamColor c = getPlayerTeam(player.getUniqueId());
+        LocationWrapper spawnLoc = map.getSpawnPoints().get(c).get(new Random().nextInt(map.getSpawnPoints().get(c).size()));
+        player.teleport(LocUtil.fromWrapper(spawnLoc));
+        player.playSound(player, Sound.ITEM_FIRECHARGE_USE, 1, 1);
+        player.showTitle(Title.title(Component.text(translate("gem.game.started", player)),
+                Component.text(translate("gem.game.started.luck", player))));
+        GameItemManager.getInstance().setGameItems(player, this);
     }
 
     private void startStarterCountdown() {
@@ -353,12 +372,12 @@ public class Game implements Listener {
     }
 
     private void tick() {
+        int redGems = gemManager.calculateTeamGemsRed();
+        int blueGems = gemManager.calculateTeamGemsBlue();
         timeLeft--;
         updateBossBar();
 
         if (timeLeft == -1) {
-            int redGems = gemManager.calculateTeamGemsRed();
-            int blueGems = gemManager.calculateTeamGemsBlue();
             if (redGems > blueGems) {
                 endGame(TeamColor.RED, bossBar);
             } else if (blueGems > redGems) {
@@ -366,6 +385,13 @@ public class Game implements Listener {
             } else {
                 suddenDeath();
             }
+        }
+
+        if (redGems == 10) {
+            endGame(TeamColor.RED, bossBar);
+        }
+        if (blueGems == 10) {
+            endGame(TeamColor.BLUE, bossBar);
         }
     }
 
@@ -412,8 +438,8 @@ public class Game implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
-        if (GemRush.getGamestate() == GameState.RUNNING) {
-            if (event.getPlayer().getLocation().getY() <= 88) {
+        if (state.equals(GameState.RUNNING)) {
+            if (event.getPlayer().getLocation().getY() <= Math.min(map.getArena().getL1().getY(), map.getArena().getL2().getY())) {
                 deathHandler.setPlayerDead(event.getPlayer());
             }
         }

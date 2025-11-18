@@ -23,7 +23,7 @@ public class GemRushCompleter extends AdvancedTabCompleter implements TabComplet
             if (args.length <= 1) {
                 complete(completions, args[0], "join", "start", "setup", "stats", "help", "reload");
             } else if (args.length == 2 && args[0].equalsIgnoreCase("setup")) {
-                complete(completions, args[1], "create", "delete", "list", "set", "add");
+                complete(completions, args[1], "create", "delete", "list", "set", "add", "setlobby");
             } else if (args.length == 3 && args[0].equalsIgnoreCase("setup")) {
                 if (args[1].equalsIgnoreCase("add")) {
                     complete(completions, args[2], "spawn");

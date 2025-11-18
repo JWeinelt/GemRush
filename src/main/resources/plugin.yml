@@ -1,5 +1,5 @@
 name: GemRush
-version: '${version}'
+version: '1.1.0'
 main: net.teamcastle.gemgrab.GemRush
 api-version: '1.21'
 commands:

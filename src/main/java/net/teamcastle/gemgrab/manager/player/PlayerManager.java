@@ -13,7 +13,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @UtilityClass
 public class PlayerManager {
-
     @Getter
     private final List<GPlayer> gPlayers = new CopyOnWriteArrayList<>();
 
@@ -33,9 +32,9 @@ public class PlayerManager {
         }
     }
 
-    public GPlayer getGemgrabPlayerByUUID(UUID uuid) {
+    public GPlayer getGemGrabPlayerByUUID(UUID uuid) {
         return gPlayers.stream()
-                .filter(gemgrabPlayer -> gemgrabPlayer.getUuid().equals(uuid))
+                .filter(gemGrabPlayer -> gemGrabPlayer.getUuid().equals(uuid))
                 .findFirst()
                 .orElse(null);
     }
@@ -45,14 +44,14 @@ public class PlayerManager {
         return player != null && player.isValid();
     }
 
-    public void addGemgrabPlayer(Player player) {
-        if (!isGemgrabPlayer(player)) {
+    public void addGemGrabPlayer(Player player) {
+        if (!isGemGrabPlayer(player)) {
             gPlayers.add(new GPlayer(player.getName(), player.getUniqueId(), null, true, false));
         }
     }
 
-    public boolean isGemgrabPlayer(Player player) {
+    public boolean isGemGrabPlayer(Player player) {
         return gPlayers.stream()
-                .anyMatch(gemgrabPlayer -> gemgrabPlayer.getUuid().equals(player.getUniqueId()));
+                .anyMatch(gemGrabPlayer -> gemGrabPlayer.getUuid().equals(player.getUniqueId()));
     }
 }

@@ -8,6 +8,7 @@ import net.teamcastle.gemgrab.manager.player.GPlayer;
 import net.teamcastle.gemgrab.manager.player.PlayerManager;
 import net.teamcastle.gemgrab.manager.teams.TeamColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,7 +27,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
-        if (GemRush.getGamestate().equals(GameState.LOBBY)) {
+        if (game.getState().equals(GameState.LOBBY)) {
             Player player = (Player) event.getEntity();
             if (player.getFoodLevel() != 20) {
                 player.setFoodLevel(20);
@@ -42,12 +43,12 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
-        GameState gamestate = GemRush.getGamestate();
+        GameState gamestate = game.getState();
         if (event.getEntity() instanceof Player player) {
             switch (gamestate) {
                 case LOBBY, STARTING, ENDED -> event.setCancelled(true);
                 case RUNNING -> {
-                    GPlayer gPlayer = PlayerManager.getGemgrabPlayerByUUID(player.getUniqueId());
+                    GPlayer gPlayer = PlayerManager.getGemGrabPlayerByUUID(player.getUniqueId());
                     if (!gPlayer.isDead()) {
                         if (player.getHealth() - event.getFinalDamage() <= 0) {
                             game.getDeathHandler().setPlayerDead(player);
@@ -61,7 +62,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onDamageByEntity(EntityDamageByEntityEvent event) {
-        GameState gamestate = GemRush.getGamestate();
+        GameState gamestate = game.getState();
         switch (gamestate) {
             case RUNNING, ENDED -> {
                 Player killer;
@@ -74,8 +75,8 @@ public class PlayerListener implements Listener {
                             event.setCancelled(true);
                             return;
                         }
-                        GPlayer gPlayer = PlayerManager.getGemgrabPlayerByUUID(player.getUniqueId());
-                        GPlayer gemgrabKiller = PlayerManager.getGemgrabPlayerByUUID(killer.getUniqueId());
+                        GPlayer gPlayer = PlayerManager.getGemGrabPlayerByUUID(player.getUniqueId());
+                        GPlayer gemgrabKiller = PlayerManager.getGemGrabPlayerByUUID(killer.getUniqueId());
                         if (gemgrabKiller.isDead()) {
                             event.setCancelled(true);
                             return;
@@ -98,8 +99,8 @@ public class PlayerListener implements Listener {
                             event.setCancelled(true);
                             return;
                         }
-                        GPlayer gPlayer = PlayerManager.getGemgrabPlayerByUUID(player.getUniqueId());
-                        GPlayer gemgrabKiller = PlayerManager.getGemgrabPlayerByUUID(killer.getUniqueId());
+                        GPlayer gPlayer = PlayerManager.getGemGrabPlayerByUUID(player.getUniqueId());
+                        GPlayer gemgrabKiller = PlayerManager.getGemGrabPlayerByUUID(killer.getUniqueId());
                         if (!gPlayer.isDead()) {
                             gPlayer.setLastDamager(gemgrabKiller);
                             if (player.getHealth() - event.getFinalDamage() <= 0) {
@@ -117,7 +118,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        if (GemRush.getGamestate().equals(GameState.STARTING)) {
+        if (game.getState().equals(GameState.STARTING)) {
             Location currentLocation = e.getFrom();
             Location targetLocation = e.getTo();
             if (currentLocation.getBlockX() != targetLocation.getBlockX() ||
@@ -130,7 +131,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
         Player player = e.getPlayer();
-        switch (GemRush.getGamestate()) {
+        switch (game.getState()) {
             case LOBBY, ENDED -> e.setCancelled(true);
         }
         if (e.getItem() == null) return;
@@ -168,10 +169,10 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPickUpItem(EntityPickupItemEvent e) {
         if (!(e.getEntity() instanceof Player player)) return;
-        switch (GemRush.getGamestate()) {
+        switch (game.getState()) {
             case LOBBY, ENDED-> e.setCancelled(true);
             case STARTING, RUNNING -> {
-                GPlayer gPlayer = PlayerManager.getGemgrabPlayerByUUID(player.getUniqueId());
+                GPlayer gPlayer = PlayerManager.getGemGrabPlayerByUUID(player.getUniqueId());
                 if (gPlayer.isDead()) {
                     e.setCancelled(true);
                 }

@@ -11,6 +11,7 @@ import net.teamcastle.gemgrab.manager.player.PlayerManager;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -23,7 +24,7 @@ public class PlayerDeathHandler {
     private final Game game;
 
     public void setPlayerDead(Player dead) {
-        GPlayer died = PlayerManager.getGemgrabPlayerByUUID(dead.getUniqueId());
+        GPlayer died = PlayerManager.getGemGrabPlayerByUUID(dead.getUniqueId());
         if (died.getLastDamager() == null) {
             game.sendMessageToPlayers(mainPrefix + "§c" + dead.getName() + " §7died!");
             applyDeathEffects(dead);
@@ -37,7 +38,8 @@ public class PlayerDeathHandler {
     }
 
     public void applyDeathEffects(Player dead) {
-        GPlayer player = PlayerManager.getGemgrabPlayerByUUID(dead.getUniqueId());
+        dead.playSound(dead, Sound.ENTITY_PLAYER_DEATH, 1, 1);
+        GPlayer player = PlayerManager.getGemGrabPlayerByUUID(dead.getUniqueId());
         player.setLastDamager(null);
         dead.setAllowFlight(true);
         dropPlayerGems(dead);
@@ -85,15 +87,16 @@ public class PlayerDeathHandler {
                         , Component.text("§7Respawning in §a" + countDown + "s")));
                 countDown--;
                 if (countDown < 0) {
-                    //TODO: Teleport
-                    GameItemManager.getInstance().setGameItems(player);
+                    game.spawnPlayer(player);
+                    GameItemManager.getInstance().setGameItems(player, game);
                     player.setAllowFlight(false);
                     player.setHealth(20);
                     player.setFoodLevel(20);
-                    GPlayer gPlayer = PlayerManager.getGemgrabPlayerByUUID(player.getUniqueId());
+                    GPlayer gPlayer = PlayerManager.getGemGrabPlayerByUUID(player.getUniqueId());
                     gPlayer.setDead(false);
                     gPlayer.setVisible(true);
                     PlayerManager.hidePlayer(gPlayer);
+                    cancel();
                 }
             }
         }.runTaskTimer(GemRush.getInstance(), 0, 20);

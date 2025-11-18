@@ -51,6 +51,7 @@ public class GamePoolManager {
 
 
     public CompletableFuture<Game> prepareNewGame() {
+        if (mapTemplates.isEmpty()) return CompletableFuture.completedFuture(null);
         String map = randomMap();
         String instanceName = "Game_" + map;
 

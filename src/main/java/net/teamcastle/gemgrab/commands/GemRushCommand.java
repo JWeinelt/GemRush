@@ -1,5 +1,10 @@
 package net.teamcastle.gemgrab.commands;
 
+import de.codeblocksmc.codelib.locations.LocUtil;
+import net.teamcastle.gemgrab.manager.GameManager;
+import net.teamcastle.gemgrab.manager.SetupManager;
+import net.teamcastle.gemgrab.storage.Configuration;
+import net.teamcastle.gemgrab.storage.LocalStorage;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -27,9 +32,9 @@ public class GemRushCommand implements CommandExecutor {
                 return true;
             } else if (args.length == 1) {
                 if (args[0].equalsIgnoreCase("start")) {
-
+                    GameManager.getInstance().getPlayerGame(player).startGame();
                 } else if (args[0].equalsIgnoreCase("join")) {
-
+                    GameManager.getInstance().joinGame(player);
                 } else if (args[0].equalsIgnoreCase("setup")) {
                     player.sendMessage("§e=== §6GemRush Setup Command §e===");
                     player.sendMessage("§aSetup create <MapName> <MaxCount> §7- Create a new map.");
@@ -45,6 +50,20 @@ public class GemRushCommand implements CommandExecutor {
 
                 } else {
                     player.sendMessage("§cUnknown subcommand. Use §a/gemrush help §7for assistance.");
+                }
+            } else if (args.length == 2) {
+                if (args[0].equalsIgnoreCase("setup")) {
+                    if (args[1].equalsIgnoreCase("setlobby")) {
+                        Configuration.getInstance().setLobbySpawn(LocUtil.fromBukkit(player.getLocation()));
+                        LocalStorage.getInstance().saveConfig();
+                    }
+                }
+            } else if (args.length == 3) {
+                if (args[0].equalsIgnoreCase("setup")) {
+                    if (args[1].equalsIgnoreCase("create")) {
+                        String mapName = args[2];
+                        new SetupManager(mapName, player);
+                    }
                 }
             }
         }

@@ -16,6 +16,7 @@ import net.teamcastle.gemgrab.manager.items.gameitems.GameItemManager;
 import net.teamcastle.gemgrab.manager.lobby.LobbyManager;
 import net.teamcastle.gemgrab.manager.map.GameMap;
 import net.teamcastle.gemgrab.manager.map.GameMapManager;
+import net.teamcastle.gemgrab.manager.player.PlayerManager;
 import net.teamcastle.gemgrab.storage.LocalStorage;
 import net.teamcastle.gemgrab.storage.database.MySQLManager;
 import org.bukkit.Bukkit;
@@ -23,6 +24,7 @@ import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -37,10 +39,6 @@ public final class GemRush extends JavaPlugin {
     public static GemRush instance;
     public static String mainPrefix = "§8» §2Gem§aRush §8•";
     private Logger log;
-
-    @Getter
-    @Setter
-    private static GameState gamestate;
 
     @Getter
     @Setter
@@ -76,7 +74,6 @@ public final class GemRush extends JavaPlugin {
         localStorage.loadMaps();
         log.info("Initializing stats...");
         statManager = new StatManager();
-        gamestate = GameState.LOBBY;
 
         log.info("Connecting to MySQL database...");
         mySQLManager = new MySQLManager(localStorage.getConfig());
@@ -107,6 +104,8 @@ public final class GemRush extends JavaPlugin {
         log.info("Setting world settings...");
         setWorldSettings();
         log.info("Plugin startup complete! GemRush is now enabled.");
+
+        for (Player p : Bukkit.getOnlinePlayers()) PlayerManager.addGemGrabPlayer(p);
     }
 
     public void registerCommands() {
@@ -122,7 +121,6 @@ public final class GemRush extends JavaPlugin {
             world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
             world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
             world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
-            world.getEntities().forEach(Entity::remove);
         }
     }
 
